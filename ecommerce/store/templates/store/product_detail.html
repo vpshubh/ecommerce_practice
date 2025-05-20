@@ -1,0 +1,47 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="product-detail">
+    <div class="product-images">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="main-image">
+    </div>
+    <div class="thumbnails">
+        {% for image in product.images.all %}
+        <img src="{{ image.url }}" alt="{{ product.name }}" class="thumbnail">
+        {% endfor %}
+    </div>
+    {% if product.get_recommendations %}
+    <section class="recommendations">
+        <h3>You may also like</h3>
+        <div class="product-grid">
+            {% for product in product.get_recommendations %}
+            <!-- Reuse your product card template -->
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+    <div class="product-status {{ product.stock_status }}">
+        {% if product.stock_status == 'out-of-stock' %}
+        Out of Stock
+        {% elif product.stock_status == 'low-stock' %}
+        Only {{ product.stock }} left!
+        {% else %}
+        In Stock
+        {% endif %}
+    </div>
+    <div class="product-info">
+        <h1>{{ product.name }}</h1>
+        <p class="price">${{ product.price }}</p>
+        <p class="stock">{{ product.stock }} in stock</p>
+        <p class="description">{{ product.description }}</p>
+
+        <form action="{% url 'cart_add' product.id %}" method="post" class="add-to-cart">
+            {% csrf_token %}
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
+            <button type="submit" class="btn">Add to Cart</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

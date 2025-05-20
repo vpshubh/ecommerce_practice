@@ -1,0 +1,142 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Carousel -->
+<section class="hero" data-aos="fade">
+    <div class="hero-carousel">
+        <div class="carousel-slide active">
+            <img src="{% static 'images/hero_image.jpg' %}" alt="Hero Banner 1">
+            <div class="hero-content">
+                <h1>Welcome to Amazon Clone</h1>
+                <p>Discover millions of products at amazing prices</p>
+                <a href="{% url 'product_list' %}" class="btn btn-primary">Shop Now</a>
+            </div>
+        </div>
+        <!-- Additional slides would go here -->
+    </div>
+</section>
+
+<!-- Category Boxes -->
+<section class="category-boxes" data-aos="fade-up">
+    <div class="container">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="boxes-grid">
+            {% for category in categories %}
+            <div class="category-box">
+                <a href="{% url 'product_list_by_category' category.slug %}">
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                    <h3>{{ category.name }}</h3>
+                    <p>Shop now <i class="fas fa-chevron-right"></i></p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="featured-products" data-aos="fade-up">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Products</h2>
+            <a href="{% url 'product_list' %}" class="see-all">See all</a>
+        </div>
+        <div class="products-grid">
+            {% for product in featured_products %}
+            <div class="product-card">
+                <div class="product-badge">
+                    {% if product.discount_percent %}
+                    <span class="discount-badge">-{{ product.discount_percent }}%</span>
+                    {% endif %}
+                    {% if product.is_new %}
+                    <span class="new-badge">New</span>
+                    {% endif %}
+                </div>
+                <a href="{{ product.get_absolute_url }}" class="product-image">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                </a>
+                <div class="product-info">
+                    <h3 class="product-title">{{ product.name|truncatechars:50 }}</h3>
+                    <div class="product-rating">
+                        <div class="stars">
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= product.average_rating %} <i class="fas fa-star"></i>
+                                {% else %}
+                                <i class="far fa-star"></i>
+                                {% endif %}
+                                {% endfor %}
+                        </div>
+                        <span class="rating-count">({{ product.review_count }})</span>
+                    </div>
+                    <div class="product-price">
+                        {% if product.discount_price %}
+                        <span class="original-price">${{ product.price }}</span>
+                        <span class="current-price">${{ product.discount_price }}</span>
+                        {% else %}
+                        <span class="current-price">${{ product.price }}</span>
+                        {% endif %}
+                    </div>
+                    <button class="add-to-cart" data-product-id="{{ product.id }}">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Today's Deals -->
+<section class="todays-deals" data-aos="fade-up">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Today's Deals</h2>
+            <a href="#" class="see-all">See all deals</a>
+        </div>
+        <div class="deals-grid">
+            {% for deal in todays_deals %}
+            <div class="deal-card">
+                <div class="deal-badge">
+                    <span class="deal-percent">-{{ deal.discount_percent }}%</span>
+                    <span class="deal-time">Ends in {{ deal.time_remaining }}</span>
+                </div>
+                <a href="{{ deal.product.get_absolute_url }}" class="deal-image">
+                    <img src="{{ deal.product.image.url }}" alt="{{ deal.product.name }}">
+                </a>
+                <div class="deal-info">
+                    <div class="deal-price">
+                        <span class="original-price">${{ deal.product.price }}</span>
+                        <span class="current-price">${{ deal.discount_price }}</span>
+                    </div>
+                    <p class="deal-title">{{ deal.product.name|truncatechars:40 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Customer Favorites -->
+<section class="customer-favorites" data-aos="fade-up">
+    <div class="container">
+        <h2 class="section-title">Customer Favorites</h2>
+        <div class="favorites-tabs">
+            <button class="tab-btn active" data-tab="trending">Trending</button>
+            <button class="tab-btn" data-tab="bestsellers">Best Sellers</button>
+            <button class="tab-btn" data-tab="new-releases">New Releases</button>
+        </div>
+        <div class="favorites-content">
+            <div class="tab-pane active" id="trending">
+                <!-- Trending products would be loaded here via AJAX -->
+            </div>
+            <div class="tab-pane" id="bestsellers">
+                <!-- Best sellers would be loaded here via AJAX -->
+            </div>
+            <div class="tab-pane" id="new-releases">
+                <!-- New releases would be loaded here via AJAX -->
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

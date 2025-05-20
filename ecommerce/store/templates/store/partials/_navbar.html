@@ -1,0 +1,61 @@
+{% load static %}
+<header class="navbar">
+    <div class="navbar-container">
+        <!-- Logo -->
+        <a href="{% url 'home' %}" class="navbar-logo">
+            <img src="{% static 'images/logo.png' %}" alt="Amazon Clone" width="100">
+        </a>
+
+        <!-- Search Bar -->
+        <div class="navbar-search">
+            <form action="{% url 'product_search' %}" method="get">
+                <select class="search-select">
+                    <option>All</option>
+                    <option>Electronics</option>
+                    <option>Fashion</option>
+                    <option>Home</option>
+                </select>
+                <input type="text" name="q" class="search-input" placeholder="Search Amazon Clone">
+                <button type="submit" class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navbar-nav">
+            <div class="nav-item">
+                <a href="{% url 'profile' %}">
+                    <i class="fas fa-user"></i>
+                    <span class="nav-line-1">
+                        Hello, {% if user.is_authenticated %} {{ user.username }} {% else %} Sign In {% endif %}
+                    </span>
+
+                    <span class="nav-line-2">Account & Lists</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'order_history' %}">
+                    <span class="nav-line-1">Returns</span>
+                    <span class="nav-line-2">& Orders</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'cart' %}" class="nav-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">{{ cart|length }}</span>
+                    <span>Cart</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Secondary Nav -->
+    <div class="navbar-secondary">
+        <a href="#"><i class="fas fa-bars"></i> All</a>
+        <a href="#">Today's Deals</a>
+        <a href="#">Customer Service</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Sell</a>
+    </div>
+</header>
