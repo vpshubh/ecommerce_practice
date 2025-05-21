@@ -6,14 +6,20 @@
 <section class="hero" data-aos="fade">
     <div class="hero-carousel">
         <div class="carousel-slide active">
-            <img src="{% static 'images/hero_image.jpg' %}" alt="Hero Banner 1">
             <div class="hero-content">
                 <h1>Welcome to Amazon Clone</h1>
-                <p>Discover millions of products at amazing prices</p>
+                <img src="{% static 'images/hero_image.jpg' %}" alt="Hero Banner 1">
+                <p>Shop the latest products at unbeatable prices</p>
                 <a href="{% url 'product_list' %}" class="btn btn-primary">Shop Now</a>
             </div>
         </div>
-        <!-- Additional slides would go here -->
+        <div class="carousel-slide">
+            <img src="{% static 'images/box1_image.jpg' %}" alt="Hero Banner 2">
+            <p>Discover millions of products at amazing prices</p>
+            <a href="{% url 'product_list' %}" class="btn btn-primary">Shop Now</a>
+        </div>
+    </div>
+    <!-- Additional slides would go here -->
     </div>
 </section>
 
