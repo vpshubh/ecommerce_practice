@@ -1,0 +1,103 @@
+/* Top Navigation Bar */
+.header {
+  background-color: var(--amazon-dark);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header__logo {
+  width: 100px;
+  object-fit: contain;
+  margin: 0 20px;
+  margin-top: 18px;
+}
+
+.header__search {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.header__searchInput {
+  height: 38px;
+  padding: 10px;
+  border: none;
+  width: 100%;
+}
+
+.header__searchIcon {
+  padding: 5px;
+  height: 38px !important;
+  width: 45px !important;
+  background-color: var(--amazon-orange);
+  color: #111;
+}
+
+.header__nav {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.header__option {
+  display: flex;
+  flex-direction: column;
+  margin: 0 10px;
+  color: white;
+}
+
+.header__optionLineOne {
+  font-size: 10px;
+}
+
+.header__optionLineTwo {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.header__optionBasket {
+  display: flex;
+  align-items: center;
+  color: white;
+  margin-left: 10px;
+}
+
+.header__basketCount {
+  margin: 0 10px;
+}
+
+/* Secondary Nav */
+.subnav {
+  height: 39px;
+  background-color: var(--amazon-light);
+  display: flex;
+  align-items: center;
+  color: white;
+  padding: 0 20px;
+}
+
+.subnav__menu {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 9px;
+}
+
+.subnav__menuIcon {
+  margin-right: 5px;
+}
+
+.subnav__links {
+  display: flex;
+}
+
+.subnav__link {
+  padding: 8px 9px;
+  font-size: 14px;
+  white-space: nowrap;
+}

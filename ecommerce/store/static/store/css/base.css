@@ -1,0 +1,66 @@
+/* Reset & Base Styles */
+:root {
+  --amazon-orange: #FF9900;
+  --amazon-dark: #131921;
+  --amazon-light: #232F3E;
+  --amazon-gray: #EAEDED;
+  --amazon-text: #0F1111;
+  --amazon-price: #B12704;
+  --amazon-stars: #FFA41C;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Amazon Ember', Arial, sans-serif;
+  background-color: var(--amazon-gray);
+  color: var(--amazon-text);
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.container {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Amazon-specific button styles */
+.btn {
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 3px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: var(--amazon-orange);
+  border: 1px solid #a88734;
+  color: #111;
+}
+
+.btn-primary:hover {
+  background: #f0c14b;
+}
+
+.btn-secondary {
+  background: var(--amazon-light);
+  color: white;
+  border: 1px solid #8d9096;
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+}

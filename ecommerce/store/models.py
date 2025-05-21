@@ -1,22 +1,45 @@
 from django.db import models
 from django.conf import settings  # Add this import
+from django.urls import reverse
+from django.core.validators import MinValueValidator
+from django.utils.text import slugify
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
+    image = models.ImageField(upload_to='categories/', blank=True)
+
     def __str__(self):
         return self.name
 
 class Product(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2, 
+                              validators=[MinValueValidator(0.01)])
+    discount_price = models.DecimalField(max_digits=10, decimal_places=2, 
+                                       blank=True, null=True)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='products/')
     stock = models.PositiveIntegerField()
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def get_absolute_url(self):
+        return reverse('product_detail', args=[self.id, self.slug])
+
+    def get_discount_percent(self):
+        if self.discount_price:
+            return int(100 - (self.discount_price / self.price * 100))
+        return None
+
+    class Meta:
+        ordering = ['-created']
+        indexes = [models.Index(fields=['id', 'slug'])]
+
     
     def get_recommendations(self):
         # Get products from same category

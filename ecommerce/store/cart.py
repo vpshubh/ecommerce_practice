@@ -1,6 +1,5 @@
 from decimal import Decimal
 from django.conf import settings
-from store.models import Product
 
 class Cart:
     def __init__(self, request):
@@ -17,6 +16,7 @@ class Cart:
                 'quantity': 0,
                 'price': str(product.price)
             }
+        
         if override_quantity:
             self.cart[product_id]['quantity'] = quantity
         else:
@@ -52,14 +52,3 @@ class Cart:
     def clear(self):
         del self.session[settings.CART_SESSION_ID]
         self.save()
-        
-    def get_total_items(self):
-        return sum(item['quantity'] for item in self.cart.values())
-
-    def get_discounted_total(self, discount_percent=0):
-        total = self.get_total_price()
-        return total * (1 - discount_percent / 100)
-
-    def apply_coupon(self, coupon_code):
-        # Add coupon logic here
-        pass

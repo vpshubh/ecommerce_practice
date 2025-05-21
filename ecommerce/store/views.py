@@ -14,12 +14,21 @@ def home(request):
 
 def product_list(request, category_slug=None):
     form = ProductFilterForm(request.GET or None)
+    category = None
+    categories = Category.objects.all()
     products = Product.objects.filter(available=True).select_related('category')
     
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
-    
+   
+    query = request.GET.get('q')
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) | 
+            Q(description__icontains=query)
+        )
+        
     if form.is_valid():
         if form.cleaned_data['category']:
             products = products.filter(category=form.cleaned_data['category'])
@@ -33,11 +42,14 @@ def product_list(request, category_slug=None):
     return render(request, 'store/product_list.html', {
         'products': products,
         'form': form,
+        'categories': categories,
         'category': category if category_slug else None
     })
+    
 def product_detail(request, id, slug):
     product = get_object_or_404(Product, id=id, slug=slug, available=True)
     reviews = product.reviews.all()
+
     
     if request.method == 'POST':
         form = ReviewForm(request.POST)
@@ -55,6 +67,7 @@ def product_detail(request, id, slug):
         'reviews': reviews,
         'form': form
     })
+    
 def cart(request):
     return render(request, 'store/cart.html')
 
