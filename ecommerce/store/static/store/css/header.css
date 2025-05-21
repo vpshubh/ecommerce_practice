@@ -1,103 +1,260 @@
-/* Top Navigation Bar */
+/* Enhanced header.css - Styles for the site header and navigation */
+
 .header {
-  background-color: var(--amazon-dark);
-  height: 60px;
-  display: flex;
-  align-items: center;
+  background-color: var(--bg-white);
+  box-shadow: var(--box-shadow-sm);
   position: sticky;
   top: 0;
-  z-index: 100;
+  width: 100%;
+  z-index: 1000;
+  transition: var(--transition-base);
 }
 
-.header__logo {
-  width: 100px;
-  object-fit: contain;
-  margin: 0 20px;
-  margin-top: 18px;
+.header-scrolled {
+  box-shadow: var(--box-shadow-md);
 }
 
-.header__search {
+.header-container {
   display: flex;
-  flex: 1;
   align-items: center;
-  border-radius: 4px;
-  overflow: hidden;
+  justify-content: space-between;
+  padding: var(--spacing-md) 0;
 }
 
-.header__searchInput {
-  height: 38px;
-  padding: 10px;
-  border: none;
+/* Logo styling */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.logo img {
+  max-height: 40px;
+  width: auto;
+}
+
+.logo-text {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--primary-color);
+  letter-spacing: -0.5px;
+}
+
+/* Main navigation */
+.nav-main {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.nav-link {
+  color: var(--text-color);
+  font-weight: 500;
+  position: relative;
+  padding-bottom: var(--spacing-xs);
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--primary-color);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--primary-color);
+  transition: var(--transition-base);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
   width: 100%;
 }
 
-.header__searchIcon {
-  padding: 5px;
-  height: 38px !important;
-  width: 45px !important;
-  background-color: var(--amazon-orange);
-  color: #111;
-}
-
-.header__nav {
-  display: flex;
-  justify-content: space-evenly;
-}
-
-.header__option {
-  display: flex;
-  flex-direction: column;
-  margin: 0 10px;
-  color: white;
-}
-
-.header__optionLineOne {
-  font-size: 10px;
-}
-
-.header__optionLineTwo {
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.header__optionBasket {
+/* Secondary navigation (user actions) */
+.nav-secondary {
   display: flex;
   align-items: center;
-  color: white;
-  margin-left: 10px;
+  gap: var(--spacing-md);
 }
 
-.header__basketCount {
-  margin: 0 10px;
-}
-
-/* Secondary Nav */
-.subnav {
-  height: 39px;
-  background-color: var(--amazon-light);
+.nav-icon {
+  font-size: var(--font-size-lg);
+  color: var(--text-color);
+  position: relative;
   display: flex;
   align-items: center;
-  color: white;
-  padding: 0 20px;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: var(--transition-fast);
 }
 
-.subnav__menu {
+.nav-icon:hover {
+  background-color: var(--bg-light);
+  color: var(--primary-color);
+}
+
+/* Cart icon with item count */
+.cart-icon {
+  position: relative;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 50%;
+}
+
+/* Search bar */
+.search-form {
+  position: relative;
+  margin-right: var(--spacing-md);
+}
+
+.search-input {
+  padding: var(--spacing-sm) var(--spacing-md);
+  padding-right: 40px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-light);
+  width: 200px;
+  transition: var(--transition-base);
+}
+
+.search-input:focus {
+  outline: none;
+  width: 250px;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.search-button {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-light);
   cursor: pointer;
-  padding: 8px 9px;
+  padding: var(--spacing-xs);
+  transition: var(--transition-fast);
 }
 
-.subnav__menuIcon {
-  margin-right: 5px;
+.search-button:hover {
+  color: var(--primary-color);
 }
 
-.subnav__links {
+/* User dropdown menu */
+.user-dropdown {
+  position: relative;
+}
+
+.user-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--box-shadow-md);
+  width: 200px;
+  padding: var(--spacing-sm) 0;
+  margin-top: var(--spacing-sm);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: var(--transition-base);
+  z-index: 100;
+}
+
+.user-dropdown:hover .user-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-menu-item {
+  padding: var(--spacing-sm) var(--spacing-md);
   display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
-.subnav__link {
-  padding: 8px 9px;
-  font-size: 14px;
-  white-space: nowrap;
+.user-menu-item:hover {
+  background-color: var(--bg-light);
 }
+
+.user-menu-icon {
+  font-size: var(--font-size-md);
+  color: var(--text-light);
+}
+
+/* Mobile menu button */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+/* Category navigation */
+.nav-categories {
+  background-color: var(--bg-light);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.category-list {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.category-item {
+  color: var(--text-color);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--transition-fast);
+}
+
+.category-item:hover,
+.category-item.active {
+  color: var(--primary-color);
+}
+
+/* Announcement bar */
+.announcement-bar {
+  background-color: var(--primary-color);
+  color: white;
+  padding: var(--spacing-xs) 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+}
+
+.announcement-bar a {
+  color: white;
+  text-decoration: underline;
+}
+
+/* Responsive adjustments will be handled in responsive.css */

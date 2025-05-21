@@ -1,61 +1,75 @@
 {% load static %}
-<header class="navbar">
-    <div class="navbar-container">
-        <!-- Logo -->
-        <a href="{% url 'home' %}" class="navbar-logo">
-            <img src="{% static 'images/logo.png' %}" alt="Amazon Clone" width="100">
-        </a>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
 
-        <!-- Search Bar -->
-        <div class="navbar-search">
-            <form action="{% url 'product_search' %}" method="get">
-                <select class="search-select">
-                    <option>All</option>
-                    <option>Electronics</option>
-                    <option>Fashion</option>
-                    <option>Home</option>
-                </select>
-                <input type="text" name="q" class="search-input" placeholder="Search Amazon Clone">
-                <button type="submit" class="search-button">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
+            <!-- Logo -->
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'images/logo.png' %}" alt="Amazon Clone" width="100">
+            </a>
+
+            <!-- Toggler for Mobile View -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar Content -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+
+                <!-- Search Bar -->
+                <form class="d-flex mx-auto w-50" action="{% url 'product_search' %}" method="get">
+                    <select class="form-select me-2" name="category" style="width: auto;">
+                        <option>All</option>
+                        <option>Electronics</option>
+                        <option>Fashion</option>
+                        <option>Home</option>
+                    </select>
+                    <input class="form-control me-2" type="text" name="q" placeholder="Search Amazon Clone">
+                    <button class="btn btn-warning" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <!-- Right Nav Links -->
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'profile' %}">
+                            <i class="fas fa-user"></i>
+                            <span class="d-block small">
+                                Hello, {% if user.is_authenticated %}{{ user.username }}{% else %}Sign In{% endif %}
+                            </span>
+                            <span class="d-block small">Account & Lists</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'order_history' %}">
+                            <span class="d-block small">Returns</span>
+                            <span class="d-block small">& Orders</span>
+                        </a>
+                    </li>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link text-white" href="{% url 'cart' %}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle">
+                                {{ cart|length }}
+                            </span>
+                            <span>Cart</span>
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
         </div>
-
-        <!-- Navigation -->
-        <nav class="navbar-nav">
-            <div class="nav-item">
-                <a href="{% url 'profile' %}">
-                    <i class="fas fa-user"></i>
-                    <span class="nav-line-1">
-                        Hello, {% if user.is_authenticated %} {{ user.username }} {% else %} Sign In {% endif %}
-                    </span>
-
-                    <span class="nav-line-2">Account & Lists</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'order_history' %}">
-                    <span class="nav-line-1">Returns</span>
-                    <span class="nav-line-2">& Orders</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'cart' %}" class="nav-cart">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count">{{ cart|length }}</span>
-                    <span>Cart</span>
-                </a>
-            </div>
-        </nav>
-    </div>
+    </nav>
 
     <!-- Secondary Nav -->
-    <div class="navbar-secondary">
-        <a href="#"><i class="fas fa-bars"></i> All</a>
-        <a href="#">Today's Deals</a>
-        <a href="#">Customer Service</a>
-        <a href="#">Gift Cards</a>
-        <a href="#">Sell</a>
+    <div class="bg-light py-2 border-bottom">
+        <div class="container d-flex gap-3 flex-wrap px-3">
+            <a href="#" class="text-dark text-decoration-none"><i class="fas fa-bars me-1"></i> All</a>
+            <a href="#" class="text-dark text-decoration-none">Today's Deals</a>
+            <a href="#" class="text-dark text-decoration-none">Customer Service</a>
+            <a href="#" class="text-dark text-decoration-none">Gift Cards</a>
+            <a href="#" class="text-dark text-decoration-none">Sell</a>
+        </div>
     </div>
 </header>
