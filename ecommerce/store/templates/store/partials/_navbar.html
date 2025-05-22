@@ -2,35 +2,26 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container-fluid">
-
-            <!-- Logo -->
             <a class="navbar-brand" href="{% url 'home' %}">
                 <img src="{% static 'images/logo.png' %}" alt="Amazon Clone" width="100">
             </a>
 
-            <!-- Toggler for Mobile View -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Navbar Content -->
             <div class="collapse navbar-collapse" id="navbarContent">
-
-                <!-- Search Bar -->
                 <form class="d-flex mx-auto w-50" action="{% url 'product_search' %}" method="get">
-                    <select class="form-select me-2" name="category" style="width: auto;">
+                    <select class="form-select me-2" name="category">
                         <option>All</option>
                         <option>Electronics</option>
                         <option>Fashion</option>
                         <option>Home</option>
                     </select>
                     <input class="form-control me-2" type="text" name="q" placeholder="Search Amazon Clone">
-                    <button class="btn btn-warning" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
+                    <button class="btn btn-warning" type="submit"><i class="fas fa-search"></i></button>
                 </form>
 
-                <!-- Right Nav Links -->
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link text-white" href="{% url 'profile' %}">
@@ -57,12 +48,10 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
         </div>
     </nav>
 
-    <!-- Secondary Nav -->
     <div class="bg-light py-2 border-bottom">
         <div class="container d-flex gap-3 flex-wrap px-3">
             <a href="#" class="text-dark text-decoration-none"><i class="fas fa-bars me-1"></i> All</a>

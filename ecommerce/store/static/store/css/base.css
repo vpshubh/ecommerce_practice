@@ -687,3 +687,20 @@ li {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #999;
 }
+
+/* Progress bar */
+
+.progress-bar {
+    width: 100%;
+    background-color: #eee;
+    border-radius: 5px;
+    overflow: hidden;
+    height: 18px;
+    margin-top: 5px;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #f08804; /* Amazon orange */
+    transition: width 0.6s ease;
+}
