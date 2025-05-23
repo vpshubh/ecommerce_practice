@@ -1,0 +1,98 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3>User Profile</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="profile-sidebar">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <div class="profile-avatar mb-3">
+                                            <i class="fas fa-user-circle fa-5x text-secondary"></i>
+                                        </div>
+                                        <h5>{{ user.username }}</h5>
+                                        <p class="text-muted">{{ user.email }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="profile-content">
+                                <h4>Account Information</h4>
+                                <hr>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>Username:</strong>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        {{ user.username }}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>Email:</strong>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        {{ user.email }}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>First Name:</strong>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        {{ user.first_name|default:"Not provided" }}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>Last Name:</strong>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        {{ user.last_name|default:"Not provided" }}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>Date Joined:</strong>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        {{ user.date_joined|date:"F d, Y" }}
+                                    </div>
+                                </div>
+
+                                <hr>
+                                <div class="mt-4">
+                                    <a href="#" class="btn btn-primary me-2">Edit Profile</a>
+                                    <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

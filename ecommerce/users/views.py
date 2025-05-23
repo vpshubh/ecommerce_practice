@@ -1,30 +1,65 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
-from .forms import SignUpForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required
 
-def signup(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = SignUpForm()
-    return render(request, 'users/register.html', {'form': form})
+def home(request):
+    return render(request, 'users/home.html')
 
-def user_login(request):
+@csrf_protect
+def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+        
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')
+            messages.success(request, 'Login successful!')
+            return redirect('home')  # Redirect to home page after successful login
+        else:
+            messages.error(request, 'Invalid username or password.')
+    
     return render(request, 'users/login.html')
 
-def profile(request):
-    return render(request, 'users/profile.html')
+@csrf_protect
+def register_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+        
+        # Validation
+        if password1 != password2:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'users/register.html')
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+            return render(request, 'users/register.html')
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email already registered.')
+            return render(request, 'users/register.html')
+        
+        # Create user
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password1)
+            messages.success(request, 'Account created successfully! Please log in.')
+            return redirect('login')
+        except Exception as e:
+            messages.error(request, 'Error creating account. Please try again.')
+    
+    return render(request, 'store/register.html')
 
-def order_history(request):
-    return render(request, 'users/order_history.html')
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('home')
+
+@login_required
+def profile_view(request):
+    return render(request, 'users/profile.html', {'user': request.user})

@@ -2,7 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Product, Category
 from .forms import ReviewForm, ProductFilterForm
 from django.db.models import Q
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import get_user_model
 
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required
+
+User = get_user_model()
 
 def home(request):
     featured_products = Product.objects.filter(available=True)[:8]
@@ -107,3 +114,86 @@ def product_search(request):
         'products': products,
         'query': query
     })
+@csrf_protect 
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, 'Login successful!')
+            return redirect('home')  # Redirect to home page after successful login
+        else:
+            messages.error(request, 'Invalid username or password.')
+    
+    return render(request, 'users/login.html')
+
+def register_view(request):
+    if request.method == 'POST':
+        # Get form data
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        
+        # Validation
+        if not all([first_name, last_name, username, email, password1, password2]):
+            messages.error(request, 'All fields are required.')
+            return render(request, 'users/register.html')
+        
+        if password1 != password2:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'users/register.html')
+        
+        if len(password1) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            return render(request, 'users/register.html')
+        
+        # Check if user already exists
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+            return render(request, 'users/register.html')
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email already registered.')
+            return render(request, 'users/register.html')
+        
+        try:
+            # Create new user
+            user = User.objects.create(
+                first_name=first_name,
+                last_name=last_name,
+                username=username,
+                email=email,
+                password=make_password(password1)  # Hash the password
+            )
+            
+            # Log the user in
+            login(request, user)
+            messages.success(request, 'Registration successful! Welcome!')
+            return redirect('profile')  # or wherever you want to redirect
+            
+        except Exception as e:
+            messages.error(request, f'Error creating account: {str(e)}')
+            return render(request, 'users/register.html')
+    
+    # GET request - show the registration form
+    return render(request, 'users/register.html')
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('home')
+
+@login_required
+def profile_view(request):
+    return render(request, 'users/profile.html', {'user': request.user})
+
+@login_required
+def order_history(request):
+    # For now, just render a simple template
+    # You can later add logic to fetch user's orders
+    return render(request, 'users/order_history.html')

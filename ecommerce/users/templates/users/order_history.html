@@ -1,0 +1,34 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h2>Your Orders</h2>
+            <hr>
+
+            {% if user.is_authenticated %}
+            <div class="alert alert-info">
+                <h4>Order History for {{ user.username }}</h4>
+                <p>Your order history will appear here once you start making purchases.</p>
+            </div>
+
+            <!-- Placeholder for future orders -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <h5>No orders yet</h5>
+                    <p class="text-muted">When you place your first order, it will appear here.</p>
+                    <a href="{% url 'home' %}" class="btn btn-primary">Start Shopping</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <h4>Please log in to view your orders</h4>
+                <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
