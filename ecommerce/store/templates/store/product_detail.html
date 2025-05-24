@@ -44,4 +44,33 @@
         </form>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    // Thumbnail click handler
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+        thumb.addEventListener('click', function () {
+            const mainImg = document.querySelector('.main-image');
+            mainImg.src = this.src;
+            mainImg.alt = this.alt;
+
+            // Add animation
+            mainImg.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                mainImg.style.transform = 'scale(1)';
+            }, 200);
+        });
+    });
+
+    // Quantity input validation
+    document.querySelector('#quantity').addEventListener('change', function () {
+        const max = parseInt(this.max);
+        if (this.value > max) {
+            this.value = max;
+            showToast(`Only ${max} available in stock`, 'info');
+        }
+    });
+</script>
+{% endblock %}
+
 {% endblock %}

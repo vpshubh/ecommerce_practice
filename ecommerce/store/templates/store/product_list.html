@@ -1,6 +1,38 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
+<!-- {% block content %}
+<div class="container">
+    <div class="filter-sidebar">
+        <h3>Filter Products</h3>
+        <form method="get" class="filter-form">
+            {{ form.as_p }}
+            <button type="submit" class="btn">Apply Filters</button>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary">Reset</a>
+        </form>
+    </div>
+
+    <div class="product-listing">
+        <div class="sorting-options">
+            <span>Sort by:</span>
+            {% for choice in form.sort.field.choices %}
+            <a href="?sort={{ choice.0 }}" class="{% if form.sort.value == choice.0 %}active{% endif %}">
+                {{ choice.1 }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="product-grid">
+            {% for product in products %}
+            <!-- Your existing product card -->
+<!--           {% empty %}
+            <p>No products found matching your criteria.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %} -->
+
 {% block content %}
 <div class="container">
     <div class="filter-sidebar">
@@ -26,9 +58,13 @@
             {% for product in products %}
             <!-- Your existing product card -->
             {% empty %}
-            <p>No products found matching your criteria.</p>
+            <div class="no-results">
+                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                <h3>No products found</h3>
+                <p>Try adjusting your search or filter criteria</p>
+                <a href="{% url 'product_list' %}" class="btn btn-warning">Reset Filters</a>
+            </div>
             {% endfor %}
         </div>
     </div>
 </div>
-{% endblock %}

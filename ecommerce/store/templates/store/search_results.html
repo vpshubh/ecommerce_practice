@@ -1,6 +1,104 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
+{% block title %}Search Results for "{{ query }}" - Amazon Clone{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container {
+        padding: 30px 0;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-image {
+        width: 100%;
+        height: 200px;
+        object-fit: contain;
+        padding: 20px;
+        background: #f8f9fa;
+    }
+
+    .product-info {
+        padding: 15px;
+    }
+
+    .product-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        color: var(--text-primary);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-price {
+        font-weight: 700;
+        color: var(--amazon-orange);
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 50px 0;
+        grid-column: 1 / -1;
+    }
+
+    .no-results i {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: var(--text-secondary);
+    }
+
+    .no-results h3 {
+        margin-bottom: 10px;
+    }
+
+    .no-results p {
+        margin-bottom: 20px;
+        color: var(--text-secondary);
+    }
+
+    .btn-warning {
+        background: var(--amazon-orange);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-warning:hover {
+        background: #e89400;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
 {% block content %}
 <div class="container">
     <h2>Search Results for "{{ query }}"</h2>

@@ -53,7 +53,7 @@ def register_view(request):
         except Exception as e:
             messages.error(request, 'Error creating account. Please try again.')
     
-    return render(request, 'store/register.html')
+    return render(request, 'users/register.html')
 
 def logout_view(request):
     logout(request)

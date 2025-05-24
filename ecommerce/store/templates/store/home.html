@@ -1,1576 +1,805 @@
 {% extends 'store/base.html' %}
-{% load static %}
+
+{% block title %}Home - Amazon Clone{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Reset and Base Styles */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    /* Floating particles background */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
     }
 
-    body {
-        font-family: 'Amazon Ember', Arial, sans-serif;
-        line-height: 1.6;
-        color: #111;
-        background-color: #eaeded;
+    .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
     }
 
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(180deg);
+        }
     }
 
-    /* Hero Section */
+    /* Enhanced Hero Section */
     .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 120px 0 80px;
         position: relative;
-        height: 600px;
-        margin-bottom: 0;
         overflow: hidden;
+        min-height: 70vh;
     }
 
-    .hero-carousel {
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-
-    .carousel-container {
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-
-    .carousel-slide {
+    .hero-section::before {
+        content: '';
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
-    }
-
-    .carousel-slide.active {
-        opacity: 1;
-    }
-
-    .hero-image-container {
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-
-    .hero-image-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .hero-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(45deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 0 80px;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
     }
 
     .hero-content {
-        max-width: 600px;
-        color: white;
-        text-align: left;
+        position: relative;
+        z-index: 2;
+        animation: slideUp 1s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .hero-title {
-        font-size: 3.5rem;
+        font-size: clamp(3rem, 6vw, 5rem);
         font-weight: 700;
-        margin-bottom: 20px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-bottom: 1.5rem;
+        background: linear-gradient(45deg, #fff, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
     }
 
     .hero-subtitle {
-        font-size: 1.3rem;
-        margin-bottom: 30px;
-        line-height: 1.5;
-        opacity: 0.95;
+        font-size: 1.4rem;
+        opacity: 0.9;
+        margin-bottom: 2.5rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
-    .hero-btn {
-        display: inline-block;
-        background: linear-gradient(135deg, #ff9900, #ff7700);
-        color: white;
-        padding: 15px 35px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
-    }
-
-    .hero-btn:hover {
-        background: linear-gradient(135deg, #ff7700, #ff5500);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 153, 0, 0.4);
-    }
-
-    /* Carousel Controls */
-    .carousel-control {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.5);
-        color: white;
+    .cta-button {
+        background: linear-gradient(45deg, #ffd700, #ffed4e);
+        color: #333;
+        padding: 18px 35px;
         border: none;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        z-index: 10;
-    }
-
-    .carousel-control:hover {
-        background: rgba(0, 0, 0, 0.8);
-        transform: translateY(-50%) scale(1.1);
-    }
-
-    .carousel-control.prev {
-        left: 30px;
-    }
-
-    .carousel-control.next {
-        right: 30px;
-    }
-
-    .carousel-indicators {
-        position: absolute;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 10px;
-        z-index: 10;
-    }
-
-    .indicator {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        border: 2px solid white;
-        background: transparent;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .indicator.active {
-        background: white;
-    }
-
-    /* Quick Access Banner */
-    .quick-access-banner {
-        background: white;
-        padding: 30px 0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
-    }
-
-    .quick-access-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 30px;
-        align-items: center;
-    }
-
-    .quick-access-item {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 20px;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    .quick-access-item:hover {
-        background: #f8f9fa;
-        transform: translateY(-2px);
-    }
-
-    .quick-access-item i {
-        font-size: 2.5rem;
-        color: #ff9900;
-    }
-
-    .quick-access-item h4 {
+        border-radius: 50px;
         font-size: 1.2rem;
         font-weight: 600;
-        margin-bottom: 5px;
-    }
-
-    .quick-access-item p {
-        color: #666;
-        font-size: 0.9rem;
-    }
-
-    /* Section Styles */
-    .section-title {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 30px;
-        color: #111;
-        text-align: center;
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    .view-all-btn {
-        color: #0066c0;
         text-decoration: none;
-        font-weight: 600;
-        padding: 10px 20px;
-        border: 2px solid #0066c0;
-        border-radius: 5px;
+        display: inline-block;
         transition: all 0.3s ease;
+        box-shadow: 0 15px 35px rgba(255, 215, 0, 0.3);
+        position: relative;
+        overflow: hidden;
     }
 
-    .view-all-btn:hover {
-        background: #0066c0;
-        color: white;
+    .cta-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
     }
 
-    /* Category Showcase */
-    .category-showcase {
+    .cta-button:hover::before {
+        left: 100%;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 50px rgba(255, 215, 0, 0.4);
+        color: #333;
+    }
+
+    /* Categories Section */
+    .categories-section {
+        padding: 80px 0;
         background: white;
-        padding: 50px 0;
-        margin-bottom: 30px;
+        position: relative;
     }
 
-    .category-grid {
+    .section-title {
+        text-align: center;
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 3rem;
+        color: #333;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(45deg, var(--amazon-orange), #ffd700);
+        border-radius: 2px;
+    }
+
+    .categories-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 25px;
+        gap: 2rem;
+        margin-top: 3rem;
     }
 
     .category-card {
-        position: relative;
-        border-radius: 15px;
+        background: white;
+        border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease;
+        text-decoration: none;
+        color: inherit;
+        height: 300px;
+        position: relative;
+        cursor: pointer;
     }
 
     .category-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    .category-link {
-        display: block;
+        transform: translateY(-15px) rotateX(5deg);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
         text-decoration: none;
         color: inherit;
     }
 
     .category-image {
-        position: relative;
         height: 200px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: white;
+        position: relative;
         overflow: hidden;
     }
 
-    .category-image img {
+    .category-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
     }
 
-    .category-card:hover .category-image img {
-        transform: scale(1.1);
-    }
-
-    .category-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-        color: white;
-        padding: 30px 20px 20px;
-        text-align: center;
+    .category-card:hover .category-image::before {
+        left: 100%;
     }
 
     .category-name {
-        display: block;
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 5px;
+        padding: 20px;
+        font-weight: 600;
+        text-align: center;
+        font-size: 1.2rem;
     }
 
-    .category-count {
-        font-size: 0.9rem;
-        opacity: 0.9;
-    }
-
-    /* Featured Products */
-    .featured-products {
-        background: white;
-        padding: 50px 0;
-        margin-bottom: 30px;
+    /* Featured Products Section */
+    .featured-section {
+        padding: 80px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     }
 
     .products-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 25px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
     }
 
     .product-card {
         background: white;
-        border-radius: 12px;
+        border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease;
+        height: 100%;
         position: relative;
+        cursor: pointer;
     }
 
     .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    .product-badges {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        z-index: 5;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .badge {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: white;
-    }
-
-    .badge.discount {
-        background: #e74c3c;
-    }
-
-    .badge.new {
-        background: #27ae60;
-    }
-
-    .badge.bestseller {
-        background: #f39c12;
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
     }
 
     .product-image {
         position: relative;
-        height: 250px;
         overflow: hidden;
-    }
-
-    .product-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-
-    .product-card:hover .product-image img {
-        transform: scale(1.05);
-    }
-
-    .product-actions {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .product-card:hover .product-actions {
-        opacity: 1;
-    }
-
-    .action-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: none;
-        background: white;
-        color: #666;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .action-btn:hover {
-        background: #ff9900;
-        color: white;
-        transform: scale(1.1);
-    }
-
-    .product-info {
-        padding: 20px;
-    }
-
-    .product-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 10px;
-        line-height: 1.4;
-    }
-
-    .product-title a {
-        color: #111;
-        text-decoration: none;
-    }
-
-    .product-title a:hover {
-        color: #0066c0;
-    }
-
-    .product-rating {
+        height: 250px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-
-    .stars {
-        color: #ffa500;
-    }
-
-    .rating-count {
-        color: #666;
-        font-size: 0.9rem;
-    }
-
-    .product-price {
-        margin-bottom: 20px;
-    }
-
-    .original-price {
-        text-decoration: line-through;
-        color: #666;
-        margin-right: 10px;
-    }
-
-    .current-price {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #e74c3c;
-    }
-
-    .savings {
-        display: block;
-        color: #27ae60;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-top: 5px;
-    }
-
-    .add-to-cart-btn {
-        width: 100%;
-        background: linear-gradient(135deg, #ff9900, #ff7700);
+        justify-content: center;
+        font-size: 3rem;
         color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
     }
 
-    .add-to-cart-btn:hover {
-        background: linear-gradient(135deg, #ff7700, #ff5500);
-        transform: translateY(-2px);
-    }
-
-    /* Today's Deals */
-    .todays-deals {
-        background: #f8f9fa;
-        padding: 50px 0;
-        margin-bottom: 30px;
-    }
-
-    .deals-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 25px;
-    }
-
-    .deal-card {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        position: relative;
-    }
-
-    .deal-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    .deal-timer {
+    .product-badge {
         position: absolute;
         top: 15px;
         left: 15px;
-        background: rgba(231, 76, 60, 0.9);
+        background: var(--amazon-orange);
         color: white;
-        padding: 8px 12px;
+        padding: 6px 12px;
         border-radius: 20px;
-        font-size: 0.9rem;
+        font-size: 12px;
         font-weight: 600;
-        z-index: 5;
+        z-index: 2;
     }
 
-    .deal-image {
-        position: relative;
-        height: 200px;
-        overflow: hidden;
-    }
-
-    .deal-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .deal-badge {
+    .wishlist-btn {
         position: absolute;
         top: 15px;
         right: 15px;
-        background: #e74c3c;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .deal-info {
-        padding: 20px;
-    }
-
-    .deal-title a {
-        color: #111;
-        text-decoration: none;
-        font-weight: 600;
-    }
-
-    .deal-title a:hover {
-        color: #0066c0;
-    }
-
-    .deal-price {
-        margin: 15px 0;
-    }
-
-    .deal-progress {
-        margin-top: 15px;
-    }
-
-    .progress-bar {
-        width: 100%;
-        height: 8px;
-        background: #e0e0e0;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(135deg, #ff9900, #ff7700);
-        transition: width 0.3s ease;
-    }
-
-    .claimed-text {
-        display: block;
-        margin-top: 8px;
-        font-size: 0.9rem;
-        color: #666;
-    }
-
-    /* Customer Reviews */
-    .customer-reviews {
-        background: white;
-        padding: 50px 0;
-        margin-bottom: 30px;
-    }
-
-    .reviews-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 30px;
-    }
-
-    .review-card {
-        background: #f8f9fa;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-    }
-
-    .review-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .review-rating {
-        margin-bottom: 20px;
-    }
-
-    .review-text {
-        font-style: italic;
-        line-height: 1.6;
-        margin-bottom: 20px;
-        color: #444;
-    }
-
-    .reviewer-info {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
-        gap: 15px;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 2;
     }
 
-    .reviewer-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        overflow: hidden;
+    .wishlist-btn:hover {
+        background: white;
+        transform: scale(1.1);
     }
 
-    .reviewer-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .reviewer-details h5 {
-        font-weight: 600;
-        margin-bottom: 2px;
-    }
-
-    .reviewer-details span {
-        color: #666;
-        font-size: 0.9rem;
-    }
-
-    /* Newsletter */
-    .newsletter-signup {
-        background: linear-gradient(135deg, #232f3e, #37475a);
+    .wishlist-btn.active {
+        background: var(--amazon-orange);
         color: white;
-        padding: 50px 0;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        padding: 80px 0;
+        background: linear-gradient(135deg, var(--amazon-blue) 0%, var(--amazon-light-blue) 100%);
+        color: white;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 3rem;
         text-align: center;
+        margin-top: 3rem;
     }
 
-    .newsletter-content {
-        max-width: 600px;
-        margin: 0 auto;
+    .stat-item {
+        padding: 2rem;
+        transition: transform 0.3s ease;
     }
 
-    .newsletter-text h3 {
-        font-size: 2rem;
-        margin-bottom: 10px;
+    .stat-item:hover {
+        transform: translateY(-5px);
     }
 
-    .newsletter-text p {
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--amazon-orange);
+    }
+
+    .stat-label {
+        font-size: 1.2rem;
         opacity: 0.9;
-        margin-bottom: 30px;
+        font-weight: 500;
+    }
+
+    /* Newsletter Section */
+    .newsletter-section {
+        padding: 80px 0;
+        background: white;
+        text-align: center;
     }
 
     .newsletter-form {
+        max-width: 500px;
+        margin: 2rem auto 0;
         display: flex;
-        max-width: 400px;
-        margin: 0 auto;
-        gap: 0;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
 
-    .newsletter-form input {
+    .newsletter-input {
         flex: 1;
+        min-width: 250px;
         padding: 15px 20px;
-        border: none;
-        border-radius: 8px 0 0 8px;
+        border: 2px solid #e1e5e9;
+        border-radius: 50px;
         font-size: 1rem;
-    }
-
-    .subscribe-btn {
-        background: #ff9900;
-        color: white;
-        border: none;
-        padding: 15px 25px;
-        border-radius: 0 8px 8px 0;
-        font-weight: 600;
-        cursor: pointer;
+        outline: none;
         transition: all 0.3s ease;
     }
 
-    .subscribe-btn:hover {
-        background: #ff7700;
+    .newsletter-input:focus {
+        border-color: var(--amazon-orange);
+        box-shadow: 0 0 0 3px rgba(255, 159, 0, 0.1);
     }
 
-    /* No Content States */
-    .no-products,
-    .no-deals {
-        text-align: center;
-        padding: 60px 20px;
-        color: #666;
+    .newsletter-btn {
+        padding: 15px 30px;
+        background: var(--amazon-orange);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
     }
 
-    .no-products i,
-    .no-deals i {
-        font-size: 4rem;
-        margin-bottom: 20px;
-        color: #ccc;
+    .newsletter-btn:hover {
+        background: #e89400;
+        transform: translateY(-2px);
     }
 
-    .no-products h3,
-    .no-deals h3 {
-        font-size: 1.5rem;
-        margin-bottom: 10px;
+    /* Scroll indicator */
+    .scroll-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(45deg, var(--amazon-orange), #ffd700);
+        z-index: 9999;
+        transition: width 0.1s ease;
     }
 
-    /* Responsive Design */
+    /* Mobile Responsiveness */
     @media (max-width: 768px) {
         .hero-title {
             font-size: 2.5rem;
         }
 
         .hero-subtitle {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
 
-        .hero-overlay {
-            padding: 0 30px;
-        }
-
-        .carousel-control {
-            display: none;
-        }
-
-        .section-header {
-            flex-direction: column;
-            text-align: center;
+        .categories-grid,
+        .products-grid,
+        .stats-grid {
+            grid-template-columns: 1fr;
         }
 
         .newsletter-form {
             flex-direction: column;
-            gap: 15px;
         }
 
-        .newsletter-form input,
-        .subscribe-btn {
-            border-radius: 8px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .hero-title {
-            font-size: 2rem;
-        }
-
-        .products-grid,
-        .deals-grid,
-        .category-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .quick-access-grid {
-            grid-template-columns: 1fr;
+        .newsletter-input {
+            min-width: auto;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Scroll Indicator -->
+<div class="scroll-indicator" id="scrollIndicator"></div>
 
-<!-- Hero Carousel -->
+<!-- Floating Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Hero Section -->
 <section class="hero-section">
-    <div class="hero-carousel">
-        <div class="carousel-container">
-            <div class="carousel-slide active">
-                <div class="hero-image-container">
-                    <img src="/api/placeholder/1200/600" alt="Prime Day Deals">
-                    <div class="hero-overlay">
-                        <div class="hero-content">
-                            <h1 class="hero-title">Prime Day is here</h1>
-                            <p class="hero-subtitle">Save big on electronics, home & garden, fashion & more</p>
-                            <a href="{% url 'product_list' %}" class="hero-btn">Shop Prime Day deals</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="carousel-slide">
-                <div class="hero-image-container">
-                    <img src="/api/placeholder/1200/600" alt="Electronics Sale">
-                    <div class="hero-overlay">
-                        <div class="hero-content">
-                            <h1 class="hero-title">Electronics Sale</h1>
-                            <p class="hero-subtitle">Up to 50% off on laptops, phones & accessories</p>
-                            <a href="{% url 'product_list' %}" class="hero-btn">Explore deals</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="carousel-slide">
-                <div class="hero-image-container">
-                    <img src="/api/placeholder/1200/600" alt="Home & Kitchen">
-                    <div class="hero-overlay">
-                        <div class="hero-content">
-                            <h1 class="hero-title">Home & Kitchen</h1>
-                            <p class="hero-subtitle">Transform your space with our best deals</p>
-                            <a href="{% url 'product_list' %}" class="hero-btn">Shop now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Carousel Controls -->
-        <button class="carousel-control prev" onclick="prevSlide()">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="carousel-control next" onclick="nextSlide()">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-
-        <!-- Carousel Indicators -->
-        <div class="carousel-indicators">
-            <button class="indicator active" onclick="currentSlide(1)"></button>
-            <button class="indicator" onclick="currentSlide(2)"></button>
-            <button class="indicator" onclick="currentSlide(3)"></button>
-        </div>
-    </div>
-</section>
-
-<!-- Quick Access Banner -->
-<section class="quick-access-banner">
     <div class="container">
-        <div class="quick-access-grid">
-            <div class="quick-access-item">
-                <i class="fas fa-shipping-fast"></i>
-                <div>
-                    <h4>Fast Delivery</h4>
-                    <p>Free shipping on orders over $35</p>
-                </div>
-            </div>
-            <div class="quick-access-item">
-                <i class="fas fa-undo"></i>
-                <div>
-                    <h4>Easy Returns</h4>
-                    <p>30-day return policy</p>
-                </div>
-            </div>
-            <div class="quick-access-item">
-                <i class="fas fa-headset"></i>
-                <div>
-                    <h4>24/7 Support</h4>
-                    <p>Customer service available</p>
-                </div>
-            </div>
-            <div class="quick-access-item">
-                <i class="fas fa-shield-alt"></i>
-                <div>
-                    <h4>Secure Payment</h4>
-                    <p>100% secure transactions</p>
-                </div>
-            </div>
+        <div class="hero-content text-center">
+            <h1 class="hero-title">Welcome to ShopEase</h1>
+            <p class="hero-subtitle">Discover amazing products at unbeatable prices. Your one-stop destination for
+                everything you need, delivered right to your doorstep.</p>
+            <a href="{% url 'product_list' %}" class="cta-button">Start Shopping Now</a>
         </div>
     </div>
 </section>
 
-<!-- Category Showcase -->
-<section class="category-showcase">
+<!-- Categories Section -->
+<section class="categories-section">
     <div class="container">
         <h2 class="section-title">Shop by Category</h2>
-        <div class="category-grid">
-            {% for category in categories %}
-            <div class="category-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
-                <a href="{% url 'product_list_by_category' category.slug %}" class="category-link">
-                    <div class="category-image">
-                        <img src="{{ category.image.url }}" alt="{{ category.name }}">
-                        <div class="category-overlay">
-                            <span class="category-name">{{ category.name }}</span>
-                            <span class="category-count">{{ category.product_count }} items</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            {% empty %}
-            <!-- Default categories with placeholder images -->
-            <div class="category-card">
+        <div class="categories-grid">
+            <a href="{% url 'product_list' %}?category=electronics" class="category-card" onclick="animateCard(this)">
                 <div class="category-image">
-                    <img src="/api/placeholder/300/200" alt="Electronics">
-                    <div class="category-overlay">
-                        <span class="category-name">Electronics</span>
-                        <span class="category-count">1000+ items</span>
-                    </div>
+                    📱
                 </div>
-            </div>
-            <div class="category-card">
+                <div class="category-name">Electronics</div>
+            </a>
+            <a href="{% url 'product_list' %}?category=fashion" class="category-card" onclick="animateCard(this)">
                 <div class="category-image">
-                    <img src="/api/placeholder/300/200" alt="Fashion">
-                    <div class="category-overlay">
-                        <span class="category-name">Fashion</span>
-                        <span class="category-count">500+ items</span>
-                    </div>
+                    👔
                 </div>
-            </div>
-            <div class="category-card">
+                <div class="category-name">Fashion</div>
+            </a>
+            <a href="{% url 'product_list' %}?category=home" class="category-card" onclick="animateCard(this)">
                 <div class="category-image">
-                    <img src="/api/placeholder/300/200" alt="Home & Kitchen">
-                    <div class="category-overlay">
-                        <span class="category-name">Home & Kitchen</span>
-                        <span class="category-count">800+ items</span>
-                    </div>
+                    🏠
                 </div>
-            </div>
-            <div class="category-card">
+                <div class="category-name">Home & Garden</div>
+            </a>
+            <a href="{% url 'product_list' %}?category=sports" class="category-card" onclick="animateCard(this)">
                 <div class="category-image">
-                    <img src="/api/placeholder/300/200" alt="Books">
-                    <div class="category-overlay">
-                        <span class="category-name">Books</span>
-                        <span class="category-count">300+ items</span>
-                    </div>
+                    ⚽
                 </div>
-            </div>
-            {% endfor %}
+                <div class="category-name">Sports</div>
+            </a>
+            <a href="{% url 'product_list' %}?category=books" class="category-card" onclick="animateCard(this)">
+                <div class="category-image">
+                    📚
+                </div>
+                <div class="category-name">Books</div>
+            </a>
+            <a href="{% url 'product_list' %}?category=health" class="category-card" onclick="animateCard(this)">
+                <div class="category-image">
+                    💊
+                </div>
+                <div class="category-name">Health & Beauty</div>
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Featured Products -->
-<section class="featured-products">
+<!-- Featured Products Section -->
+<section class="featured-section">
     <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Featured Products</h2>
-            <a href="{% url 'product_list' %}" class="view-all-btn">View all products</a>
-        </div>
-        <div class="products-container">
-            <div class="products-grid">
-                {% for product in featured_products %}
-                <div class="product-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
-                    <div class="product-badges">
-                        {% if product.discount_percent %}
-                        <span class="badge discount">-{{ product.discount_percent }}%</span>
-                        {% endif %}
-                        {% if product.is_new %}
-                        <span class="badge new">New</span>
-                        {% endif %}
-                        {% if product.is_bestseller %}
-                        <span class="badge bestseller">Best Seller</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="product-image">
-                        <a href="{{ product.get_absolute_url }}">
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                        </a>
-                        <div class="product-actions">
-                            <button class="action-btn wishlist-btn" data-product-id="{{ product.id }}">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <button class="action-btn quick-view-btn" data-product-id="{{ product.id }}">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="product-info">
-                        <h3 class="product-title">
-                            <a href="{{ product.get_absolute_url }}">{{ product.name|truncatechars:50 }}</a>
-                        </h3>
-
-                        <div class="product-rating">
-                            <div class="stars">
-                                {% for i in "12345" %}
-                                {% if forloop.counter <= product.average_rating %} <i class="fas fa-star"></i>
-                                    {% else %}
-                                    <i class="far fa-star"></i>
-                                    {% endif %}
-                                    {% endfor %}
-                            </div>
-                            <span class="rating-count">({{ product.review_count }})</span>
-                        </div>
-
-                        <div class="product-price">
-                            {% if product.discount_price %}
-                            <span class="original-price">${{ product.price }}</span>
-                            <span class="current-price">${{ product.discount_price }}</span>
-                            <span class="savings">Save ${{
-                                product.price|floatformat:2|sub:product.discount_price|floatformat:2 }}</span>
-                            {% else %}
-                            <span class="current-price">${{ product.price }}</span>
-                            {% endif %}
-                        </div>
-
-                        <div class="product-actions-bottom">
-                            <button class="add-to-cart-btn" data-product-id="{{ product.id }}">
-                                <i class="fas fa-shopping-cart"></i>
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
+        <h2 class="section-title">Featured Products</h2>
+        <div class="products-grid">
+            <!-- Sample featured products -->
+            <div class="product-card" onclick="flipCard(this)">
+                <div class="product-image">
+                    <div class="product-badge">Hot Deal</div>
+                    <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist(1, this)">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    📱
                 </div>
-                {% empty %}
-                <!-- Sample products with placeholder images -->
-                <div class="product-card">
-                    <div class="product-badges">
-                        <span class="badge discount">-25%</span>
-                        <span class="badge new">New</span>
+                <div class="product-info">
+                    <div class="product-title">Latest Smartphone</div>
+                    <div class="product-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="rating-count">(128 reviews)</span>
                     </div>
-
-                    <div class="product-image">
-                        <img src="/api/placeholder/280/250" alt="Wireless Headphones">
-                        <div class="product-actions">
-                            <button class="action-btn wishlist-btn">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <button class="action-btn quick-view-btn">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
+                    <div class="product-price">
+                        <span class="current-price">$599.99</span>
+                        <span class="original-price">$799.99</span>
+                        <span class="discount">25% OFF</span>
                     </div>
-
-                    <div class="product-info">
-                        <h3 class="product-title">
-                            <a href="#">Wireless Bluetooth Headphones</a>
-                        </h3>
-
-                        <div class="product-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <span class="rating-count">(125)</span>
-                        </div>
-
-                        <div class="product-price">
-                            <span class="original-price">$99.99</span>
-                            <span class="current-price">$74.99</span>
-                            <span class="savings">Save $25.00</span>
-                        </div>
-
-                        <div class="product-actions-bottom">
-                            <button class="add-to-cart-btn">
-                                <i class="fas fa-shopping-cart"></i>
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
+                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(1)">
+                        Add to Cart
+                    </button>
                 </div>
-
-                <div class="product-card">
-                    <div class="product-badges">
-                        <span class="badge bestseller">Best Seller</span>
-                    </div>
-
-                    <div class="product-image">
-                        <img src="/api/placeholder/280/250" alt="Smart Watch">
-                        <div class="product-actions">
-                            <button class="action-btn wishlist-btn">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <button class="action-btn quick-view-btn">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="product-info">
-                        <h3 class="product-title">
-                            <a href="#">Smart Fitness Watch</a>
-                        </h3>
-
-                        <div class="product-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span class="rating-count">(89)</span>
-                        </div>
-
-                        <div class="product-price">
-                            <span class="current-price">$199.99</span>
-                        </div>
-
-                        <div class="product-actions-bottom">
-                            <button class="add-to-cart-btn">
-                                <i class="fas fa-shopping-cart"></i>
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-badges">
-                        <span class="badge discount">-15%</span>
-                    </div>
-
-                    <div class="product-image">
-                        <img src="/api/placeholder/280/250" alt="Laptop">
-                        <div class="product-actions">
-                            <button class="action-btn wishlist-btn">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <button class="action-btn quick-view-btn">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="product-info">
-                        <h3 class="product-title">
-                            <a href="#">Gaming Laptop 15.6"</a>
-                        </h3>
-
-                        <div class="product-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <span class="rating-count">(45)</span>
-                        </div>
-
-                        <div class="product-price">
-                            <span class="original-price">$899.99</span>
-                            <span class="current-price">$764.99</span>
-                            <span class="savings">Save $135.00</span>
-                        </div>
-
-                        <div class="product-actions-bottom">
-                            <button class="add-to-cart-btn">
-                                <i class="fas fa-shopping-cart"></i>
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-badges">
-                        <span class="badge new">New</span>
-                    </div>
-
-                    <div class="product-image">
-                        <img src="/api/placeholder/280/250" alt="Smartphone">
-                        <div class="product-actions">
-                            <button class="action-btn wishlist-btn">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <button class="action-btn quick-view-btn">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="product-info">
-                        <h3 class="product-title">
-                            <a href="#">Latest Smartphone 5G</a>
-                        </h3>
-
-                        <div class="product-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span class="rating-count">(203)</span>
-                        </div>
-
-                        <div class="product-price">
-                            <span class="current-price">$599.99</span>
-                        </div>
-
-                        <div class="product-actions-bottom">
-                            <button class="add-to-cart-btn">
-                                <i class="fas fa-shopping-cart"></i>
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
             </div>
+
+            <div class="product-card" onclick="flipCard(this)">
+                <div class="product-image">
+                    <div class="product-badge">Best Seller</div>
+                    <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist(2, this)">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    💻
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Gaming Laptop</div>
+                    <div class="product-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <span class="rating-count">(89 reviews)</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price">$1,299.99</span>
+                        <span class="original-price">$1,599.99</span>
+                        <span class="discount">19% OFF</span>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(2)">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="flipCard(this)">
+                <div class="product-image">
+                    <div class="product-badge">New Arrival</div>
+                    <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist(3, this)">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    🎧
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Wireless Headphones</div>
+                    <div class="product-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="rating-count">(256 reviews)</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price">$199.99</span>
+                        <span class="original-price">$249.99</span>
+                        <span class="discount">20% OFF</span>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(3)">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'product_list' %}" class="btn btn-outline-primary btn-lg">View All Products</a>
         </div>
     </div>
 </section>
 
-<!-- Today's Deals -->
-<section class="todays-deals">
+<!-- Stats Section -->
+<section class="stats-section">
     <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Today's Deals</h2>
-            <a href="#" class="view-all-btn">See all deals</a>
-        </div>
-        <div class="deals-container">
-            <div class="deals-grid">
-                {% for deal in todays_deals %}
-                <div class="deal-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
-                    <div class="deal-timer">
-                        <i class="fas fa-clock"></i>
-                        <span class="time-remaining">{{ deal.time_remaining }}</span>
-                    </div>
-
-                    <div class="deal-image">
-                        <a href="{{ deal.product.get_absolute_url }}">
-                            <img src="{{ deal.product.image.url }}" alt="{{ deal.product.name }}">
-                        </a>
-                        <div class="deal-badge">
-                            <span class="discount-percent">{{ deal.discount_percent }}% OFF</span>
-                        </div>
-                    </div>
-
-                    <div class="deal-info">
-                        <h4 class="deal-title">
-                            <a href="{{ deal.product.get_absolute_url }}">{{ deal.product.name|truncatechars:40 }}</a>
-                        </h4>
-                        <div class="deal-price">
-                            <span class="original-price">${{ deal.product.price }}</span>
-                            <span class="current-price">${{ deal.discount_price }}</span>
-                        </div>
-                        <div class="deal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: {{ deal.claimed_percent }}%"></div>
-                            </div>
-                            <span class="claimed-text">{{ deal.claimed_percent }}% claimed</span>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <!-- Sample deals with placeholder images -->
-                <div class="deal-card">
-                    <div class="deal-timer">
-                        <i class="fas fa-clock"></i>
-                        <span class="time-remaining">6h 23m left</span>
-                    </div>
-
-                    <div class="deal-image">
-                        <img src="/api/placeholder/300/200" alt="Wireless Speaker">
-                        <div class="deal-badge">
-                            <span class="discount-percent">40% OFF</span>
-                        </div>
-                    </div>
-
-                    <div class="deal-info">
-                        <h4 class="deal-title">
-                            <a href="#">Portable Bluetooth Speaker</a>
-                        </h4>
-                        <div class="deal-price">
-                            <span class="original-price">$79.99</span>
-                            <span class="current-price">$47.99</span>
-                        </div>
-                        <div class="deal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 65%"></div>
-                            </div>
-                            <span class="claimed-text">65% claimed</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="deal-card">
-                    <div class="deal-timer">
-                        <i class="fas fa-clock"></i>
-                        <span class="time-remaining">4h 45m left</span>
-                    </div>
-
-                    <div class="deal-image">
-                        <img src="/api/placeholder/300/200" alt="Coffee Maker">
-                        <div class="deal-badge">
-                            <span class="discount-percent">30% OFF</span>
-                        </div>
-                    </div>
-
-                    <div class="deal-info">
-                        <h4 class="deal-title">
-                            <a href="#">Premium Coffee Maker</a>
-                        </h4>
-                        <div class="deal-price">
-                            <span class="original-price">$149.99</span>
-                            <span class="current-price">$104.99</span>
-                        </div>
-                        <div class="deal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 42%"></div>
-                            </div>
-                            <span class="claimed-text">42% claimed</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="deal-card">
-                    <div class="deal-timer">
-                        <i class="fas fa-clock"></i>
-                        <span class="time-remaining">8h 12m left</span>
-                    </div>
-
-                    <div class="deal-image">
-                        <img src="/api/placeholder/300/200" alt="Tablet">
-                        <div class="deal-badge">
-                            <span class="discount-percent">35% OFF</span>
-                        </div>
-                    </div>
-
-                    <div class="deal-info">
-                        <h4 class="deal-title">
-                            <a href="#">10-inch Android Tablet</a>
-                        </h4>
-                        <div class="deal-price">
-                            <span class="original-price">$299.99</span>
-                            <span class="current-price">$194.99</span>
-                        </div>
-                        <div class="deal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 78%"></div>
-                            </div>
-                            <span class="claimed-text">78% claimed</span>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
+        <h2 class="section-title">Why Choose Us</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number" data-target="50000">0</span>
+                <div class="stat-label">Happy Customers</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="10000">0</span>
+                <div class="stat-label">Products Available</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="99">0</span>
+                <div class="stat-label">Customer Satisfaction %</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="24">0</span>
+                <div class="stat-label">Hours Support</div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Customer Reviews Section -->
-<section class="customer-reviews">
+<!-- Newsletter Section -->
+<section class="newsletter-section">
     <div class="container">
-        <h2 class="section-title">What Our Customers Say</h2>
-        <div class="reviews-grid">
-            <div class="review-card" data-aos="fade-up">
-                <div class="review-rating">
-                    <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <p class="review-text">"Amazing shopping experience! Fast delivery and excellent customer service. The
-                    product quality exceeded my expectations."</p>
-                <div class="reviewer-info">
-                    <div class="reviewer-avatar">
-                        <img src="/api/placeholder/50/50" alt="Sarah Johnson">
-                    </div>
-                    <div class="reviewer-details">
-                        <h5>Sarah Johnson</h5>
-                        <span>Verified Purchase</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-card" data-aos="fade-up" data-aos-delay="100">
-                <div class="review-rating">
-                    <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <p class="review-text">"Great product quality and competitive prices. The website is user-friendly and
-                    checkout was smooth. Highly recommended!"</p>
-                <div class="reviewer-info">
-                    <div class="reviewer-avatar">
-                        <img src="/api/placeholder/50/50" alt="Mike Davis">
-                    </div>
-                    <div class="reviewer-details">
-                        <h5>Mike Davis</h5>
-                        <span>Verified Purchase</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-card" data-aos="fade-up" data-aos-delay="200">
-                <div class="review-rating">
-                    <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <p class="review-text">"Outstanding service and quality products. The return policy is hassle-free and
-                    customer support is always helpful."</p>
-                <div class="reviewer-info">
-                    <div class="reviewer-avatar">
-                        <img src="/api/placeholder/50/50" alt="Emma Wilson">
-                    </div>
-                    <div class="reviewer-details">
-                        <h5>Emma Wilson</h5>
-                        <span>Verified Purchase</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <h2 class="section-title">Stay Updated</h2>
+        <p class="lead">Subscribe to our newsletter and get the latest deals and updates delivered to your inbox.</p>
+        <form class="newsletter-form" onsubmit="handleNewsletterSubmit(event)">
+            <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
+            <button type="submit" class="newsletter-btn">Subscribe Now</button>
+        </form>
     </div>
 </section>
+{% endblock %}
 
-<!-- Newsletter Signup -->
-<section class="newsletter-signup">
-    <div class="container">
-        <div class="newsletter-content">
-            <div class="newsletter-text">
-                <h3>Stay updated with our latest deals</h3>
-                <p>Get exclusive offers and updates delivered to your inbox</p>
-            </div>
-            <form class="newsletter-form">
-                <div class="form-group">
-                    <input type="email" placeholder="Enter your email address" required>
-                    <button type="submit" class="subscribe-btn">Subscribe</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</section>
-
+{% block extra_js %}
 <script>
-    // Carousel functionality
-    let currentSlideIndex = 0;
-    const slides = document.querySelectorAll('.carousel-slide');
-    const indicators = document.querySelectorAll('.indicator');
+    // Create floating particles
+    function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 30;
 
-    function showSlide(index) {
-        slides.forEach((slide, i) => {
-            slide.classList.toggle('active', i === index);
-        });
-        indicators.forEach((indicator, i) => {
-            indicator.classList.toggle('active', i === index);
-        });
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+
+            const size = Math.random() * 4 + 2;
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            const delay = Math.random() * 6;
+
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.animationDelay = delay + 's';
+
+            particlesContainer.appendChild(particle);
+        }
     }
 
-    function nextSlide() {
-        currentSlideIndex = (currentSlideIndex + 1) % slides.length;
-        showSlide(currentSlideIndex);
-    }
-
-    function prevSlide() {
-        currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
-        showSlide(currentSlideIndex);
-    }
-
-    function currentSlide(index) {
-        currentSlideIndex = index - 1;
-        showSlide(currentSlideIndex);
-    }
-
-    // Auto-advance carousel
-    setInterval(nextSlide, 5000);
-
-    // Add to cart functionality
-    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const productId = this.dataset.productId;
-
-            // Visual feedback
-            this.innerHTML = '<i class="fas fa-check"></i> Added!';
-            this.style.backgroundColor = '#28a745';
-
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
-                this.style.backgroundColor = '';
-            }, 2000);
-        });
+    // Update scroll indicator
+    window.addEventListener('scroll', () => {
+        const scrollPercent = (window.pageYOffset / (document.body.scrollHeight - window.innerHeight)) * 100;
+        document.getElementById('scrollIndicator').style.width = scrollPercent + '%';
     });
 
-    // Wishlist functionality
-    document.querySelectorAll('.wishlist-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const icon = this.querySelector('i');
-            if (icon.classList.contains('far')) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                this.style.color = '#e74c3c';
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                this.style.color = '';
-            }
-        });
-    });
-
-    // Newsletter form submission
-    document.querySelector('.newsletter-form').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const email = this.querySelector('input[type="email"]').value;
-
-        // Show success message
-        const button = this.querySelector('.subscribe-btn');
-        button.innerHTML = 'Subscribed!';
-        button.style.backgroundColor = '#28a745';
+    // Animate category cards
+    function animateCard(card) {
+        card.style.transform = 'scale(0.95)';
+        card.style.transition = 'transform 0.1s ease';
 
         setTimeout(() => {
-            button.innerHTML = 'Subscribe';
-            button.style.backgroundColor = '';
-            this.reset();
-        }, 3000);
+            card.style.transform = 'scale(1.05)';
+        }, 100);
+
+        setTimeout(() => {
+            card.style.transform = 'scale(1)';
+        }, 200);
+    }
+
+    // Flip product cards
+    function flipCard(card) {
+        card.style.transform = 'rotateY(180deg)';
+        card.style.transition = 'transform 0.6s ease';
+
+        setTimeout(() => {
+            card.style.transform = 'rotateY(0deg)';
+        }, 600);
+    }
+
+    // Animate counter numbers
+    function animateCounters() {
+        const counters = document.querySelectorAll('.stat-number');
+
+        counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-target'));
+            const increment = target / 200;
+            let current = 0;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                counter.textContent = Math.floor(current);
+            }, 10);
+        });
+    }
+
+    // Intersection Observer for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                if (entry.target.classList.contains('stats-section')) {
+                    animateCounters();
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Observe sections for animations
+    document.querySelectorAll('.stats-section').forEach(section => {
+        observer.observe(section);
     });
 
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+    // Handle newsletter submission
+    function handleNewsletterSubmit(event) {
+        event.preventDefault();
+        const submitBtn = event.target.querySelector('.newsletter-btn');
+        const originalText = submitBtn.textContent;
+
+        submitBtn.textContent = 'Subscribing...';
+        submitBtn.disabled = true;
+
+        // Simulate newsletter subscription
+        setTimeout(() => {
+            submitBtn.textContent = 'Subscribed!';
+            submitBtn.style.background = '#4CAF50';
+            showToast('Successfully subscribed to newsletter!', 'success');
+
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                submitBtn.style.background = 'var(--amazon-orange)';
+                event.target.reset();
+            }, 2000);
+        }, 1500);
+    }
+
+    // Add parallax effect to hero section
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const hero = document.querySelector('.hero-section');
+        const rate = scrolled * -0.3;
+
+        if (hero) {
+            hero.style.transform = `translateY(${rate}px)`;
+        }
+    });
+
+    // Add mouse movement effect to category cards
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = (y - centerY) / 15;
+            const rotateY = (centerX - x) / 15;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+        });
+    });
+
+    // Initialize particles on load
+    window.addEventListener('load', createParticles);
+
+    // Smooth scrolling for CTA button
+    document.querySelector('.cta-button').addEventListener('click', function (e) {
+        if (this.getAttribute('href').startsWith('#')) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
                 target.scrollIntoView({
-                    behavior: 'smooth'
+                    behavior: 'smooth',
+                    block: 'start'
                 });
             }
-        });
+        }
     });
-
-    // Initialize AOS animation library if available
-    if (typeof AOS !== 'undefined') {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-in-out',
-            once: true
-        });
-    }
 </script>
-
 {% endblock %}
