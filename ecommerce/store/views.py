@@ -12,6 +12,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView
 from .models import *
 import json
+from users.forms import CustomUserCreationForm  # Add this import at the top
+
 
 def home(request):
     """Enhanced home page with featured products and categories"""
@@ -87,7 +89,14 @@ def product_list(request):
         'selected_category': selected_category,
         'current_sort': sort_by,
     }
-    return render(request, 'store/product_list.html', context)
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render(request, 'store/partials/product_grid.html', {'products': products})
+    return render(request, 'store/product_list.html', {
+        'products': products,
+        'popular_products': Product.objects.popular()[:4]  # Implement this queryset
+    })
+    # return render(request, 'store/product_list.html', context)
 
 def product_detail(request, slug):
     """Enhanced product detail with reviews and related products"""
@@ -98,17 +107,17 @@ def product_detail(request, slug):
         is_active=True
     ).exclude(id=product.id)[:4]
     
-    # Check if user has purchased this product (for verified reviews)
+    # Check if user has purchased this product
     has_purchased = False
     user_review = None
     if request.user.is_authenticated:
-        has_purchased = OrderItem.objects.filter(
-            order__user=request.user, 
-            product=product,
-            order__status='delivered'
-        ).exists()
-        
         try:
+            has_purchased = OrderItem.objects.filter(
+                order__user=request.user, 
+                product=product,
+                order__status='delivered'
+            ).exists()
+            
             user_review = Review.objects.get(product=product, user=request.user)
         except Review.DoesNotExist:
             pass
@@ -123,34 +132,44 @@ def product_detail(request, slug):
     return render(request, 'store/product_detail.html', context)
 
 @login_required
-@require_POST
 def add_to_cart(request):
     """AJAX endpoint to add products to cart"""
-    product_id = request.POST.get('product_id')
-    quantity = int(request.POST.get('quantity', 1))
+    if request.method == 'POST':
+        try:
+            # Handle both form data and JSON data
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+                product_id = data.get('product_id')
+                quantity = int(data.get('quantity', 1))
+            else:
+                product_id = request.POST.get('product_id')
+                quantity = int(request.POST.get('quantity', 1))
+            
+            product = Product.objects.get(id=product_id, is_active=True)
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart, 
+                product=product,
+                defaults={'quantity': quantity}
+            )
+            
+            if not created:
+                cart_item.quantity += quantity
+                cart_item.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Item added to cart',
+                'cart_count': cart.total_items
+            })
+        except Product.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Product not found'})
+        except Exception as e:
+            print(f"Cart error: {e}")  # This will show in your Django console
+            return JsonResponse({'success': False, 'message': 'An error occurred'})
     
-    try:
-        product = Product.objects.get(id=product_id, is_active=True)
-        cart, created = Cart.objects.get_or_create(user=request.user)
-        
-        cart_item, created = CartItem.objects.get_or_create(
-            cart=cart, 
-            product=product,
-            defaults={'quantity': quantity}
-        )
-        
-        if not created:
-            cart_item.quantity += quantity
-            cart_item.save()
-        
-        return JsonResponse({
-            'success': True,
-            'message': 'Item added to cart',
-            'cart_count': cart.total_items
-        })
-    except Product.DoesNotExist:
-        return JsonResponse({'success': False, 'message': 'Product not found'})
-
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
 @login_required
 def cart_view(request):
     """Enhanced shopping cart view"""
@@ -311,7 +330,7 @@ def order_history(request):
     context = {
         'orders': orders,
     }
-    return render(request, 'store/order_history.html', context)
+    return render(request, 'users/order_history.html', context)
 
 @login_required
 def profile(request):
@@ -361,9 +380,9 @@ def add_review(request, product_id):
     messages.success(request, 'Review added successfully!')
     return redirect('product_detail', slug=product.slug)
 
-def register(request):
-    """User registration"""
-    if request.method == 'POST':
+#def register(request):
+  #  """User registration"""
+"""     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
@@ -373,7 +392,7 @@ def register(request):
     else:
         form = UserCreationForm()
     
-    return render(request, 'users/register.html', {'form': form})
+    return render(request, 'users/register.html', {'form': form}) """
 
 def search_suggestions(request):
     """AJAX endpoint for search suggestions"""
@@ -418,7 +437,7 @@ def login_view(request):
 def register_view(request):
     """User registration view"""
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)  # Use custom form instead
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
@@ -427,7 +446,7 @@ def register_view(request):
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()  # Use custom form instead
     
     return render(request, 'users/register.html', {'form': form})
 

@@ -1,0 +1,21 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Your Wishlist</h2>
+
+    {% if wishlist_items %}
+    <div class="product-grid">
+        {% for item in wishlist_items %}
+        {% include 'store/partials/product_card.html' with product=item.product %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center">
+        <p>Your wishlist is empty.</p>
+        <a href="{% url 'product_list' %}" class="btn btn-primary mt-3">Browse Products</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

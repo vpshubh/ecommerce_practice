@@ -1,0 +1,10 @@
+<!-- store/templates/store/partials/product_grid.html -->
+{% for product in products %}
+{% include 'store/partials/product_card.html' %}
+{% empty %}
+<div class="no-results">
+    <i class="fas fa-search fa-3x mb-3"></i>
+    <h3>No products found</h3>
+    <p>Try adjusting your filters</p>
+</div>
+{% endfor %}

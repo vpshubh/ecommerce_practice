@@ -16,9 +16,12 @@ urlpatterns = [
     
     # Cart management
     path('cart/', views.cart_detail, name='cart_detail'),
-    path('cart/add/<int:product_id>/', views.cart_add, name='cart_add'),
+    #path('cart/add/<int:product_id>/', views.cart_add, name='cart_add'),
+    # In your store/urls.py
+    path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/update/', views.update_cart, name='cart_update'),  # AJAX
     path('cart/remove/<int:product_id>/', views.cart_remove, name='cart_remove'),
+    path('cart/', views.cart_view, name='cart'),
     
     # Wishlist
     path('wishlist/', views.wishlist_view, name='wishlist'),

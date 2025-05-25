@@ -4,6 +4,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from PIL import Image
 import uuid
 from django.conf import settings
+from django.utils import timezone
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -31,6 +33,11 @@ class Brand(models.Model):
     
     def __str__(self):
         return self.name
+    
+class ProductManager(models.Manager):
+    def popular(self):
+        """Returns 4 popular products (you can customize the logic)"""
+        return self.get_queryset().order_by('-created_at')[:4]
 
 class Product(models.Model):
     STOCK_STATUS = [
@@ -56,6 +63,9 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Add the custom manager
+    objects = ProductManager()
     
     class Meta:
         ordering = ['-created_at']
@@ -241,6 +251,7 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
 
+
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -285,3 +296,7 @@ class Coupon(models.Model):
         return (self.is_active and 
                 self.start_date <= now <= self.end_date and
                 (self.usage_limit is None or self.used_count < self.usage_limit))
+        
+
+  # Example: newest first
+

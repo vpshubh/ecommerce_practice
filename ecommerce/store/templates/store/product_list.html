@@ -1,70 +1,781 @@
 {% extends 'store/base.html' %}
-{% load static %}
 
-<!-- {% block content %}
-<div class="container">
-    <div class="filter-sidebar">
-        <h3>Filter Products</h3>
-        <form method="get" class="filter-form">
-            {{ form.as_p }}
-            <button type="submit" class="btn">Apply Filters</button>
-            <a href="{% url 'product_list' %}" class="btn btn-secondary">Reset</a>
-        </form>
-    </div>
+{% block title %}Product List{% endblock %}
 
-    <div class="product-listing">
-        <div class="sorting-options">
-            <span>Sort by:</span>
-            {% for choice in form.sort.field.choices %}
-            <a href="?sort={{ choice.0 }}" class="{% if form.sort.value == choice.0 %}active{% endif %}">
-                {{ choice.1 }}
-            </a>
-            {% endfor %}
-        </div>
+{% block extra_css %}
+<style>
+    /* Product-specific styles */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        gap: 20px;
+    }
 
-        <div class="product-grid">
-            {% for product in products %}
-            <!-- Your existing product card -->
-<!--           {% empty %}
-            <p>No products found matching your criteria.</p>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-{% endblock %} -->
+    /* Sidebar Filters */
+    .sidebar {
+        width: 250px;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        height: fit-content;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-section {
+        margin-bottom: 25px;
+    }
+
+    .filter-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .price-range {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .price-slider {
+        width: 100%;
+        height: 5px;
+        border-radius: 5px;
+        background: #ddd;
+        outline: none;
+    }
+
+    .filter-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-option input {
+        margin: 0;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background-color: #ff9900;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    /* Main Content Area */
+    .main-content {
+        flex: 1;
+    }
+
+    .content-header {
+        background: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .results-info {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .sort-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sort-select {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    /* Product Grid */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+
+    .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .product-image {
+        width: 100%;
+        height: 200px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        color: #ccc;
+    }
+
+    .product-info {
+        padding: 15px;
+    }
+
+    .product-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+        line-height: 1.4;
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 8px;
+    }
+
+    .stars {
+        color: #ffa500;
+    }
+
+    .rating-count {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .product-price {
+        font-size: 18px;
+        font-weight: bold;
+        color: #B12704;
+        margin-bottom: 10px;
+    }
+
+    .original-price {
+        font-size: 14px;
+        color: #666;
+        text-decoration: line-through;
+        margin-right: 8px;
+    }
+
+    .product-category {
+        font-size: 12px;
+        color: #666;
+        background-color: #f0f0f0;
+        padding: 2px 8px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .add-to-cart {
+        width: 100%;
+        padding: 8px;
+        background-color: #ff9900;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+
+    .add-to-cart:hover {
+        background-color: #e68900;
+    }
+
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .no-results-icon {
+        font-size: 64px;
+        color: #ccc;
+        margin-bottom: 20px;
+    }
+
+    .no-results h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .no-results p {
+        color: #666;
+        font-size: 16px;
+    }
+
+    /* Loading state */
+    .loading {
+        text-align: center;
+        padding: 40px;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #ff9900;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .sidebar {
+            width: 100%;
+        }
+
+        .product-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="filter-sidebar">
-        <h3>Filter Products</h3>
-        <form method="get" class="filter-form">
-            {{ form.as_p }}
-            <button type="submit" class="btn">Apply Filters</button>
-            <a href="{% url 'product_list' %}" class="btn btn-secondary">Reset</a>
-        </form>
-    </div>
+    <!-- Sidebar Filters -->
+    <aside class="sidebar">
+        <h2>Filter Products</h2>
 
-    <div class="product-listing">
-        <div class="sorting-options">
-            <span>Sort by:</span>
-            {% for choice in form.sort.field.choices %}
-            <a href="?sort={{ choice.0 }}" class="{% if form.sort.value == choice.0 %}active{% endif %}">
-                {{ choice.1 }}
-            </a>
-            {% endfor %}
-        </div>
-
-        <div class="product-grid">
-            {% for product in products %}
-            <!-- Your existing product card -->
-            {% empty %}
-            <div class="no-results">
-                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
-                <h3>No products found</h3>
-                <p>Try adjusting your search or filter criteria</p>
-                <a href="{% url 'product_list' %}" class="btn btn-warning">Reset Filters</a>
+        <div class="filter-section">
+            <div class="filter-title">Price Range</div>
+            <div class="price-range">
+                <span>$<span id="minPrice">0</span></span>
+                <input type="range" class="price-slider" id="priceSlider" min="0" max="1000" value="1000"
+                    oninput="updatePriceFilter()">
+                <span>$<span id="maxPrice">1000</span></span>
             </div>
-            {% endfor %}
         </div>
-    </div>
+
+        <div class="filter-section">
+            <div class="filter-title">Category</div>
+            <div class="filter-options" id="categoryFilters">
+                <label class="filter-option">
+                    <input type="checkbox" value="all" checked onchange="filterProducts()"> All Categories
+                </label>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-title">Rating</div>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="checkbox" value="4" onchange="filterProducts()"> 4⭐ & up
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="3" onchange="filterProducts()"> 3⭐ & up
+                </label>
+            </div>
+        </div>
+
+        <div class="filter-buttons">
+            <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-header">
+            <div class="results-info">
+                <span id="resultsCount">Loading products...</span>
+            </div>
+            <div class="sort-container">
+                <label for="sortSelect">Sort by:</label>
+                <select class="sort-select" id="sortSelect" onchange="sortProducts()">
+                    <option value="featured">Featured</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="rating">Customer Rating</option>
+                    <option value="newest">Newest First</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="productContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading products...</p>
+            </div>
+        </div>
+    </main>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sample product data - in a real app, this would come from your Django/Flask backend
+    const allProducts = [
+        {
+            id: 1,
+            title: "Wireless Bluetooth Headphones",
+            price: 79.99,
+            originalPrice: 99.99,
+            rating: 4.5,
+            reviews: 1234,
+            category: "Electronics",
+            image: "🎧",
+            featured: true
+        },
+        {
+            id: 2,
+            title: "Smart Fitness Watch",
+            price: 199.99,
+            originalPrice: 249.99,
+            rating: 4.3,
+            reviews: 856,
+            category: "Electronics",
+            image: "⌚",
+            featured: true
+        },
+        {
+            id: 3,
+            title: "Organic Cotton T-Shirt",
+            price: 24.99,
+            originalPrice: 34.99,
+            rating: 4.7,
+            reviews: 432,
+            category: "Clothing",
+            image: "👕",
+            featured: false
+        },
+        {
+            id: 4,
+            title: "Premium Coffee Beans",
+            price: 18.99,
+            originalPrice: 22.99,
+            rating: 4.6,
+            reviews: 765,
+            category: "Food",
+            image: "☕",
+            featured: true
+        },
+        {
+            id: 5,
+            title: "Yoga Exercise Mat",
+            price: 39.99,
+            originalPrice: 59.99,
+            rating: 4.4,
+            reviews: 523,
+            category: "Sports",
+            image: "🧘",
+            featured: false
+        },
+        {
+            id: 6,
+            title: "Wireless Phone Charger",
+            price: 29.99,
+            originalPrice: 39.99,
+            rating: 4.2,
+            reviews: 678,
+            category: "Electronics",
+            image: "🔌",
+            featured: false
+        },
+        {
+            id: 7,
+            title: "Classic Denim Jeans",
+            price: 59.99,
+            originalPrice: 79.99,
+            rating: 4.1,
+            reviews: 234,
+            category: "Clothing",
+            image: "👖",
+            featured: false
+        },
+        {
+            id: 8,
+            title: "Stainless Steel Water Bottle",
+            price: 19.99,
+            originalPrice: 29.99,
+            rating: 4.8,
+            reviews: 1002,
+            category: "Sports",
+            image: "🍼",
+            featured: true
+        },
+        {
+            id: 9,
+            title: "Wireless Gaming Mouse",
+            price: 49.99,
+            originalPrice: 69.99,
+            rating: 4.5,
+            reviews: 445,
+            category: "Electronics",
+            image: "🖱️",
+            featured: false
+        },
+        {
+            id: 10,
+            title: "Comfortable Running Shoes",
+            price: 89.99,
+            originalPrice: 119.99,
+            rating: 4.6,
+            reviews: 887,
+            category: "Sports",
+            image: "👟",
+            featured: true
+        },
+        {
+            id: 11,
+            title: "Leather Wallet",
+            price: 34.99,
+            originalPrice: 49.99,
+            rating: 4.3,
+            reviews: 156,
+            category: "Accessories",
+            image: "👛",
+            featured: false
+        },
+        {
+            id: 12,
+            title: "Portable Bluetooth Speaker",
+            price: 59.99,
+            originalPrice: 79.99,
+            rating: 4.4,
+            reviews: 623,
+            category: "Electronics",
+            image: "🔊",
+            featured: true
+        }
+    ];
+
+    let displayedProducts = [...allProducts];
+    let currentFilters = {
+        category: 'all',
+        maxPrice: 1000,
+        rating: 0,
+        search: ''
+    };
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function () {
+        loadProducts();
+        setupCategoryFilters();
+        setupGlobalSearch();
+    });
+
+    function setupGlobalSearch() {
+        // Get the search input from your navbar (assuming it has an ID)
+        const globalSearchInput = document.querySelector('#searchInput, .search-input, [name="search"]');
+        if (globalSearchInput) {
+            globalSearchInput.addEventListener('input', debounce(performGlobalSearch, 300));
+        }
+    }
+
+    function performGlobalSearch() {
+        const globalSearchInput = document.querySelector('#searchInput, .search-input, [name="search"]');
+        if (globalSearchInput) {
+            const searchTerm = globalSearchInput.value.toLowerCase();
+            currentFilters.search = searchTerm;
+            applyAllFilters();
+        }
+    }
+
+    function loadProducts() {
+        setTimeout(() => {
+            displayProducts(displayedProducts);
+            updateResultsCount();
+        }, 1000);
+    }
+
+    function setupCategoryFilters() {
+        const categories = [...new Set(allProducts.map(p => p.category))];
+        const categoryContainer = document.getElementById('categoryFilters');
+
+        const allCategoriesFilter = categoryContainer.querySelector('label');
+        categoryContainer.innerHTML = '';
+        categoryContainer.appendChild(allCategoriesFilter);
+
+        categories.forEach(category => {
+            const label = document.createElement('label');
+            label.className = 'filter-option';
+            label.innerHTML = `
+                <input type="checkbox" value="${category}" onchange="filterProducts()"> ${category}
+            `;
+            categoryContainer.appendChild(label);
+        });
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    function filterProducts() {
+        applyAllFilters();
+    }
+
+    function updatePriceFilter() {
+        const slider = document.getElementById('priceSlider');
+        const maxPriceSpan = document.getElementById('maxPrice');
+        currentFilters.maxPrice = parseInt(slider.value);
+        maxPriceSpan.textContent = currentFilters.maxPrice;
+        applyAllFilters();
+    }
+
+    function applyAllFilters() {
+        let filtered = [...allProducts];
+
+        // Search filter (works with global search)
+        if (currentFilters.search) {
+            filtered = filtered.filter(product =>
+                product.title.toLowerCase().includes(currentFilters.search) ||
+                product.category.toLowerCase().includes(currentFilters.search)
+            );
+        }
+
+        // Category filter
+        const categoryCheckboxes = document.querySelectorAll('#categoryFilters input[type="checkbox"]:checked');
+        const selectedCategories = Array.from(categoryCheckboxes).map(cb => cb.value);
+
+        if (!selectedCategories.includes('all') && selectedCategories.length > 0) {
+            filtered = filtered.filter(product => selectedCategories.includes(product.category));
+        }
+
+        // Price filter
+        filtered = filtered.filter(product => product.price <= currentFilters.maxPrice);
+
+        // Rating filter
+        const ratingCheckboxes = document.querySelectorAll('[value="4"], [value="3"]');
+        const checkedRatings = Array.from(ratingCheckboxes).filter(cb => cb.checked).map(cb => parseFloat(cb.value));
+
+        if (checkedRatings.length > 0) {
+            const minRating = Math.min(...checkedRatings);
+            filtered = filtered.filter(product => product.rating >= minRating);
+        }
+
+        displayedProducts = filtered;
+        displayProducts(displayedProducts);
+        updateResultsCount();
+    }
+
+    function applyFilters() {
+        applyAllFilters();
+    }
+
+    function resetFilters() {
+        // Reset global search too
+        const globalSearchInput = document.querySelector('#searchInput, .search-input, [name="search"]');
+        if (globalSearchInput) {
+            globalSearchInput.value = '';
+        }
+
+        document.getElementById('priceSlider').value = 1000;
+        document.getElementById('maxPrice').textContent = '1000';
+
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.checked = cb.value === 'all';
+        });
+
+        currentFilters = {
+            category: 'all',
+            maxPrice: 1000,
+            rating: 0,
+            search: ''
+        };
+
+        displayedProducts = [...allProducts];
+        displayProducts(displayedProducts);
+        updateResultsCount();
+    }
+
+    function sortProducts() {
+        const sortBy = document.getElementById('sortSelect').value;
+
+        switch (sortBy) {
+            case 'price-low':
+                displayedProducts.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-high':
+                displayedProducts.sort((a, b) => b.price - a.price);
+                break;
+            case 'rating':
+                displayedProducts.sort((a, b) => b.rating - a.rating);
+                break;
+            case 'newest':
+                displayedProducts.sort((a, b) => b.id - a.id);
+                break;
+            case 'featured':
+            default:
+                displayedProducts.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+                break;
+        }
+
+        displayProducts(displayedProducts);
+    }
+
+    function displayProducts(products) {
+        const container = document.getElementById('productContainer');
+
+        if (products.length === 0) {
+            container.innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon">🔍</div>
+                    <h3>No products found</h3>
+                    <p>Try adjusting your filters or search terms</p>
+                </div>
+            `;
+            return;
+        }
+
+        const productsHTML = products.map(product => `
+            <div class="product-card" onclick="viewProduct(${product.id})">
+                <div class="product-image">${product.image}</div>
+                <div class="product-info">
+                    <div class="product-category">${product.category}</div>
+                    <h3 class="product-title">${product.title}</h3>
+                    <div class="product-rating">
+                        <span class="stars">${'★'.repeat(Math.floor(product.rating))}${'☆'.repeat(5 - Math.floor(product.rating))}</span>
+                        <span class="rating-count">(${product.reviews})</span>
+                    </div>
+                    <div class="product-price">
+                        ${product.originalPrice !== product.price ? `<span class="original-price">$${product.originalPrice}</span>` : ''}
+                        $${product.price}
+                    </div>
+                    <button class="add-to-cart" onclick="addToCart(event, ${product.id})">Add to Cart</button>
+                </div>
+            </div>
+        `).join('');
+
+        container.innerHTML = `<div class="product-grid">${productsHTML}</div>`;
+    }
+
+    function updateResultsCount() {
+        const count = displayedProducts.length;
+        const total = allProducts.length;
+        const resultsElement = document.getElementById('resultsCount');
+
+        if (currentFilters.search) {
+            resultsElement.textContent = `${count} results for "${currentFilters.search}"`;
+        } else {
+            resultsElement.textContent = `Showing ${count} of ${total} products`;
+        }
+    }
+
+    function addToCart(event, productId) {
+        event.stopPropagation();
+        const product = allProducts.find(p => p.id === productId);
+
+        // Update cart count in navbar if it exists
+        const cartCount = document.querySelector('#cartCount, .cart-count');
+        if (cartCount) {
+            let currentCount = parseInt(cartCount.textContent) || 0;
+            cartCount.textContent = currentCount + 1;
+        }
+
+        // Send to backend (replace with your actual cart endpoint)
+        // fetch('/add-to-cart/', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'X-CSRFToken': getCookie('csrftoken') // For Django
+        //     },
+        //     body: JSON.stringify({product_id: productId})
+        // });
+
+        // Visual feedback
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = 'Added!';
+        button.style.backgroundColor = '#28a745';
+
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.style.backgroundColor = '#ff9900';
+        }, 1500);
+    }
+
+    function viewProduct(productId) {
+        // Navigate to product detail page
+        window.location.href = `/product/${productId}/`;
+    }
+
+    // Helper function for Django CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

@@ -2,18 +2,156 @@
 {% load static %}
 
 {% block content %}
-<div class="product-detail">
-    <div class="product-images">
-        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="main-image">
+<div class="product-detail-container">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs">
+        <a href="{% url 'home' %}">Home</a> >
+        <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a> >
+        <span>{{ product.name }}</span>
+    </nav>
+
+    <div class="product-detail-grid">
+        <!-- Image Gallery -->
+        <div class="image-gallery">
+            <div class="main-image-container">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="main-image" id="zoomable-image">
+                {% if product.discount_price %}
+                <span class="discount-badge">-{{ product.get_discount_percentage }}%</span>
+                {% endif %}
+            </div>
+
+            <div class="thumbnails">
+                <div class="thumbnail-scroll">
+                    {% for image in product.images.all %}
+                    <img src="{{ image.url }}" alt="{{ product.name }}" class="thumbnail"
+                        data-fullsize="{{ image.url }}">
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="product-info">
+            <h1>{{ product.name }}</h1>
+
+            <div class="rating-stock">
+                <div class="stars">
+                    ★★★★★ <span>({{ product.review_count }})</span>
+                </div>
+                <div class="product-status {{ product.stock_status }}">
+                    {% if product.stock_status == 'out-of-stock' %}
+                    <span class="stock-badge out">Out of Stock</span>
+                    {% elif product.stock_status == 'low-stock' %}
+                    <span class="stock-badge low">Only {{ product.stock }} left!</span>
+                    {% else %}
+                    <span class="stock-badge in">In Stock</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="pricing">
+                {% if product.discount_price %}
+                <span class="original-price">${{ product.price }}</span>
+                <span class="current-price">${{ product.discount_price }}</span>
+                {% else %}
+                <span class="current-price">${{ product.price }}</span>
+                {% endif %}
+            </div>
+
+            <div class="product-description">
+                <h3>Description</h3>
+                <p>{{ product.description }}</p>
+            </div>
+
+            <!-- Variants (if applicable) -->
+            {% if product.has_variants %}
+            <div class="variants">
+                <h4>Options:</h4>
+                <div class="variant-options">
+                    {% for variant in product.variants.all %}
+                    <button class="variant-btn" data-sku="{{ variant.sku }}">{{ variant.name }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Add to Cart -->
+            <form id="add-to-cart-form" class="cart-form">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+
+                <div class="quantity-selector">
+                    <button type="button" class="qty-btn minus">-</button>
+                    <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input">
+                    <button type="button" class="qty-btn plus">+</button>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn-add-to-cart" {% if product.stock_status=='out-of-stock'
+                        %}disabled{% endif %}>
+                        {% if product.stock_status == 'out-of-stock' %}
+                        Notify When Available
+                        {% else %}
+                        Add to Cart
+                        {% endif %}
+                    </button>
+                    <button type="button" class="btn-wishlist">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Product Meta -->
+            <div class="product-meta">
+                <div class="meta-item">
+                    <span class="meta-label">SKU:</span>
+                    <span>{{ product.sku }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Category:</span>
+                    <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+                </div>
+                <div class="meta-item share">
+                    <span class="meta-label">Share:</span>
+                    <div class="social-share">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="thumbnails">
-        {% for image in product.images.all %}
-        <img src="{{ image.url }}" alt="{{ product.name }}" class="thumbnail">
-        {% endfor %}
+
+    <!-- Tabs Section -->
+    <div class="product-tabs">
+        <ul class="tabs-nav">
+            <li class="active" data-tab="description">Description</li>
+            <li data-tab="specs">Specifications</li>
+            <li data-tab="reviews">Reviews ({{ product.review_count }})</li>
+            <li data-tab="shipping">Shipping & Returns</li>
+        </ul>
+
+        <div class="tabs-content">
+            <div class="tab-pane active" id="description">
+                {{ product.full_description|safe }}
+            </div>
+            <div class="tab-pane" id="specs">
+                <!-- Specifications table -->
+            </div>
+            <div class="tab-pane" id="reviews">
+                <!-- Reviews section -->
+            </div>
+            <div class="tab-pane" id="shipping">
+                <!-- Shipping info -->
+            </div>
+        </div>
     </div>
+
+    <!-- Recommendations -->
     {% if product.get_recommendations %}
     <section class="recommendations">
-        <h3>You may also like</h3>
+        <h3>Frequently Bought Together</h3>
         <div class="product-grid">
             {% for product in product.get_recommendations %}
             <!-- Reuse your product card template -->
@@ -21,56 +159,194 @@
         </div>
     </section>
     {% endif %}
-    <div class="product-status {{ product.stock_status }}">
-        {% if product.stock_status == 'out-of-stock' %}
-        Out of Stock
-        {% elif product.stock_status == 'low-stock' %}
-        Only {{ product.stock }} left!
-        {% else %}
-        In Stock
-        {% endif %}
-    </div>
-    <div class="product-info">
-        <h1>{{ product.name }}</h1>
-        <p class="price">${{ product.price }}</p>
-        <p class="stock">{{ product.stock }} in stock</p>
-        <p class="description">{{ product.description }}</p>
 
-        <form action="{% url 'cart_add' product.id %}" method="post" class="add-to-cart">
-            {% csrf_token %}
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
-            <button type="submit" class="btn">Add to Cart</button>
-        </form>
-    </div>
+    <!-- Recently Viewed -->
+    <section class="recently-viewed">
+        <h3>Recently Viewed</h3>
+        <div class="product-grid">
+            <!-- Dynamic content via JS/localStorage -->
+        </div>
+    </section>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
-    // Thumbnail click handler
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function addToCart(productId) {
+        const csrftoken = getCookie('csrftoken');
+        const quantity = document.getElementById('quantity') ? document.getElementById('quantity').value : 1;
+
+        // Show loading state
+        const addToCartBtn = document.querySelector('.add-to-cart-btn');
+        const originalText = addToCartBtn.innerHTML;
+        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+        addToCartBtn.disabled = true;
+
+        fetch(`/add-to-cart/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                'quantity': parseInt(quantity)
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showNotification('Product added to cart successfully!', 'success');
+
+                    // Update cart count in navbar
+                    updateCartCount(data.cart_count);
+
+                    // Reset button
+                    addToCartBtn.innerHTML = originalText;
+                    addToCartBtn.disabled = false;
+                } else {
+                    // Show error message
+                    showNotification(data.message || 'Error adding product to cart', 'error');
+
+                    // Reset button
+                    addToCartBtn.innerHTML = originalText;
+                    addToCartBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred. Please try again.', 'error');
+
+                // Reset button
+                addToCartBtn.innerHTML = originalText;
+                addToCartBtn.disabled = false;
+            });
+    }
+
+    // Image Gallery Interaction
     document.querySelectorAll('.thumbnail').forEach(thumb => {
         thumb.addEventListener('click', function () {
             const mainImg = document.querySelector('.main-image');
-            mainImg.src = this.src;
+            mainImg.src = this.dataset.fullsize;
             mainImg.alt = this.alt;
 
-            // Add animation
+            // Remove active class from all thumbnails
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            // Add active class to clicked thumbnail
+            this.classList.add('active');
+
+            // Add zoom animation
             mainImg.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                mainImg.style.transform = 'scale(1)';
-            }, 200);
+            setTimeout(() => { mainImg.style.transform = 'scale(1)'; }, 200);
         });
     });
 
-    // Quantity input validation
-    document.querySelector('#quantity').addEventListener('change', function () {
-        const max = parseInt(this.max);
-        if (this.value > max) {
-            this.value = max;
-            showToast(`Only ${max} available in stock`, 'info');
+    // Quantity Selector
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const input = this.parentElement.querySelector('.qty-input');
+            let value = parseInt(input.value);
+
+            if (this.classList.contains('minus')) {
+                if (value > 1) input.value = value - 1;
+            } else {
+                if (value < parseInt(input.max)) input.value = value + 1;
+            }
+        });
+    });
+
+    // Tab Switching
+    document.querySelectorAll('.tabs-nav li').forEach(tab => {
+        tab.addEventListener('click', function () {
+            const tabId = this.dataset.tab;
+
+            // Update active tab
+            document.querySelectorAll('.tabs-nav li').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            // Update active content
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // AJAX Add to Cart (improved)
+    document.getElementById('add-to-cart-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const form = this;
+        const submitBtn = form.querySelector('.btn-add-to-cart');
+        const originalText = submitBtn.innerHTML;
+
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+            const response = await fetch('{% url "add_to_cart" %}', {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update cart count in navbar
+                if (data.cart_count) {
+                    document.querySelector('.cart-count').textContent = data.cart_count;
+                }
+
+                // Show success message
+                showToast(data.message || 'Item added to cart', 'success');
+            } else {
+                showToast(data.message || 'Error adding to cart', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('An error occurred. Please try again.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
         }
     });
-</script>
-{% endblock %}
 
+    // Track recently viewed products
+    if (typeof (Storage) !== "undefined") {
+        let viewedProducts = JSON.parse(localStorage.getItem('viewedProducts') || '[]');
+
+        // Add current product if not already in list
+        const currentProductId = parseInt("{{ product.id|default:0 }}");
+
+        if (!viewedProducts.includes(currentProductId)) {
+            viewedProducts.unshift(currentProductId);
+            viewedProducts = viewedProducts.slice(0, 5); // Keep only last 5
+            localStorage.setItem('viewedProducts', JSON.stringify(viewedProducts));
+        }
+        // Load recently viewed products via AJAX
+        if (viewedProducts.length > 1) {
+            fetch('/api/get_products/?ids=' + viewedProducts.join(','))
+                .then(response => response.json())
+                .then(products => {
+                    // Render products in recently-viewed section
+                });
+        }
+    }
+</script>
 {% endblock %}
